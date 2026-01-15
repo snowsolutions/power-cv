@@ -65,7 +65,7 @@ const ClassicTemplate = memo(({ data, currentPage = 1, onPageCountChange }) => {
             ];
 
             console.log(
-                `[ClassicTemplate] Found ${allItems.length} breakable items`,
+                `[ClassicTemplate] Found ${allItems.length} breakable items (${h2Headers.length} h2, ${h3JobTitles.length} h3, ${filteredPageItems.length} items)`,
             );
 
             let currentPageBottom = A4_HEIGHT_PX;
@@ -94,13 +94,19 @@ const ClassicTemplate = memo(({ data, currentPage = 1, onPageCountChange }) => {
                 const itemText =
                     item.textContent?.substring(0, 50) || item.tagName;
 
-                // Check if item would cross page boundary
-                if (
-                    itemTop < currentPageBottom &&
-                    itemBottom > currentPageBottom
-                ) {
-                    // Item would be cut - check if we have space for it
-                    const spaceLeft = currentPageBottom - itemTop;
+                // Log every item for debugging
+                console.log(
+                    `[Item ${index}] "${itemText}" | tag: ${item.tagName} | isH2: ${isSectionHeader} | isH3: ${isJobTitle} | top: ${itemTop}px | bottom: ${itemBottom}px | height: ${itemHeight}px | currentPageBottom: ${currentPageBottom}px`,
+                );
+
+                // Determine which page this item should be on
+                const idealPage = Math.floor(itemTop / A4_HEIGHT_PX) + 1;
+                const idealPageBottom = idealPage * A4_HEIGHT_PX;
+
+                // Check if item would cross the boundary of its ideal page
+                if (itemTop < idealPageBottom && itemBottom > idealPageBottom) {
+                    // Item would be cut by page boundary
+                    const spaceLeft = idealPageBottom - itemTop;
 
                     // For section headers and job titles, always push to next page if they would be cut
                     // For items, push if less than minimum space or item is tall
@@ -111,7 +117,7 @@ const ClassicTemplate = memo(({ data, currentPage = 1, onPageCountChange }) => {
                         itemHeight > minSpace * 2
                     ) {
                         // Push to next page
-                        const pushDistance = currentPageBottom - itemTop;
+                        const pushDistance = idealPageBottom - itemTop;
                         item.style.marginTop = `${pushDistance}px`;
                         item.classList.add("force-page-break");
 
@@ -119,19 +125,20 @@ const ClassicTemplate = memo(({ data, currentPage = 1, onPageCountChange }) => {
                             `[PageBreak] Item ${index}: "${itemText}" | isHeader: ${isSectionHeader} | isJobTitle: ${isJobTitle} | spaceLeft: ${spaceLeft.toFixed(0)}px | pushDistance: ${pushDistance.toFixed(0)}px | reason: ${isSectionHeader ? "Section Header" : isJobTitle ? "Job Title" : spaceLeft < minSpace ? "Insufficient Space" : "Item Too Tall"}`,
                         );
 
-                        // Update page boundary
-                        pageCount++;
-                        currentPageBottom =
-                            itemTop + pushDistance + A4_HEIGHT_PX;
-                    }
-                } else if (itemTop >= currentPageBottom) {
-                    // Item starts on or after current page boundary
-                    const pagesSkipped = Math.floor(itemTop / A4_HEIGHT_PX);
-                    if (pagesSkipped > pageCount - 1) {
-                        pageCount = pagesSkipped + 1;
-                        currentPageBottom = pageCount * A4_HEIGHT_PX;
+                        // Update tracking
+                        const newPage = idealPage + 1;
+                        if (newPage > pageCount) {
+                            pageCount = newPage;
+                        }
                     }
                 }
+
+                // Update currentPageBottom for tracking
+                const itemPage = Math.ceil(itemBottom / A4_HEIGHT_PX);
+                currentPageBottom = Math.max(
+                    currentPageBottom,
+                    itemPage * A4_HEIGHT_PX,
+                );
             });
 
             // Final page count based on total height
