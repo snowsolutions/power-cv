@@ -39,15 +39,21 @@ const ClassicTemplate = memo(({ data, currentPage = 1, onPageCountChange }) => {
             const MIN_SECTION_SPACE = 60; // Space needed for section headers
             const MIN_ITEM_SPACE = 30; // Space needed for regular items
 
-            // Get all breakable items including section headers
-            const items = contentRef.current.querySelectorAll(
-                ".page-section, .page-item, .page-section-header, .section-title",
+            // Get all breakable items - prioritize h2 headers first, then other items
+            const allItems = Array.from(
+                contentRef.current.querySelectorAll(
+                    "h2.section-title, .page-item",
+                ),
+            );
+
+            console.log(
+                `[ClassicTemplate] Found ${allItems.length} breakable items`,
             );
 
             let currentPageBottom = A4_HEIGHT_PX;
             let pageCount = 1;
 
-            items.forEach((item) => {
+            allItems.forEach((item, index) => {
                 // Remove any previous page break class
                 item.classList.remove("force-page-break");
                 item.style.marginTop = "";
@@ -57,13 +63,13 @@ const ClassicTemplate = memo(({ data, currentPage = 1, onPageCountChange }) => {
                 const itemBottom = itemTop + itemHeight;
 
                 // Determine if this is a section header/title
-                const isSectionHeader =
-                    item.classList.contains("page-section-header") ||
-                    item.classList.contains("section-title") ||
-                    item.tagName === "H2";
+                const isSectionHeader = item.tagName === "H2";
                 const minSpace = isSectionHeader
                     ? MIN_SECTION_SPACE
                     : MIN_ITEM_SPACE;
+
+                const itemText =
+                    item.textContent?.substring(0, 50) || item.tagName;
 
                 // Check if item would cross page boundary
                 if (
@@ -85,6 +91,10 @@ const ClassicTemplate = memo(({ data, currentPage = 1, onPageCountChange }) => {
                         item.style.marginTop = `${pushDistance}px`;
                         item.classList.add("force-page-break");
 
+                        console.log(
+                            `[PageBreak] Item ${index}: "${itemText}" | isHeader: ${isSectionHeader} | spaceLeft: ${spaceLeft.toFixed(0)}px | pushDistance: ${pushDistance.toFixed(0)}px | reason: ${isSectionHeader ? "Section Header" : spaceLeft < minSpace ? "Insufficient Space" : "Item Too Tall"}`,
+                        );
+
                         // Update page boundary
                         pageCount++;
                         currentPageBottom =
@@ -104,6 +114,10 @@ const ClassicTemplate = memo(({ data, currentPage = 1, onPageCountChange }) => {
             const totalHeight = contentRef.current.scrollHeight;
             const calculatedPages = Math.ceil(totalHeight / A4_HEIGHT_PX);
             const finalPageCount = Math.max(pageCount, calculatedPages);
+
+            console.log(
+                `[ClassicTemplate] Complete: totalHeight=${totalHeight}px | pageCount=${pageCount} | calculatedPages=${calculatedPages} | finalPageCount=${finalPageCount}`,
+            );
 
             if (onPageCountChange) {
                 onPageCountChange(finalPageCount);
