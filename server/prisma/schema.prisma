@@ -1,0 +1,112 @@
+// Prisma Schema for Power CV
+// Database: PostgreSQL
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// CV Model
+model CV {
+  id        String   @id @default(uuid())
+  name      String   @db.VarChar(100)
+  template  String   @default("modern") @db.VarChar(50)
+  data      Json     @db.JsonB
+  userId    String?  @db.VarChar(100)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([name])
+  @@index([userId])
+  @@index([createdAt])
+  @@map("cvs")
+}
+
+// JSON Structure for data field:
+// {
+//   "personalInfo": {
+//     "sectionTitle": "Personal Information",
+//     "name": "John Doe",
+//     "email": "john@example.com",
+//     "phone": "+1234567890",
+//     "address": "City, Country",
+//     "avatar": "base64_or_url"
+//   },
+//   "introduction": {
+//     "sectionTitle": "Introduction",
+//     "content": "Rich text HTML content"
+//   },
+//   "workHistory": {
+//     "sectionTitle": "Work History",
+//     "items": [
+//       {
+//         "id": "uuid",
+//         "dateFrom": "2020-01",
+//         "dateTo": "2023-12",
+//         "companyName": "Company Name",
+//         "position": "Job Title",
+//         "description": "Job description"
+//       }
+//     ]
+//   },
+//   "certifications": {
+//     "sectionTitle": "Certifications",
+//     "items": [
+//       {
+//         "id": "uuid",
+//         "certName": "Certification Name",
+//         "organization": "Organization",
+//         "certLink": "https://...",
+//         "certExpiration": "2025-12-31"
+//       }
+//     ]
+//   },
+//   "educations": {
+//     "sectionTitle": "Education",
+//     "items": [
+//       {
+//         "id": "uuid",
+//         "schoolName": "University Name",
+//         "studyFrom": "2016-09",
+//         "studyTo": "2020-06",
+//         "profession": "Computer Science"
+//       }
+//     ]
+//   },
+//   "activities": {
+//     "sectionTitle": "Activities",
+//     "items": [
+//       {
+//         "id": "uuid",
+//         "title": "Activity Title",
+//         "description": "Description",
+//         "date": "2023-01"
+//       }
+//     ]
+//   },
+//   "professionalSkills": {
+//     "sectionTitle": "Professional Skills",
+//     "items": [
+//       {
+//         "id": "uuid",
+//         "skillName": "JavaScript",
+//         "level": "Expert",
+//         "description": "10+ years"
+//       }
+//     ]
+//   },
+//   "languageCompetencies": {
+//     "sectionTitle": "Language Competencies",
+//     "items": [
+//       {
+//         "id": "uuid",
+//         "language": "English",
+//         "proficiency": "Native"
+//       }
+//     ]
+//   }
+// }
