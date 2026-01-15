@@ -36,12 +36,12 @@ const ClassicTemplate = memo(({ data, currentPage = 1, onPageCountChange }) => {
     useEffect(() => {
         if (contentRef.current) {
             const A4_HEIGHT_PX = 1122; // 297mm at 96 DPI
-            const MIN_SECTION_SPACE = 80; // Space needed for section headers
-            const MIN_ITEM_SPACE = 40; // Space needed for regular items
+            const MIN_SECTION_SPACE = 60; // Space needed for section headers
+            const MIN_ITEM_SPACE = 30; // Space needed for regular items
 
-            // Get all breakable items
+            // Get all breakable items including section headers
             const items = contentRef.current.querySelectorAll(
-                ".page-section, .page-item, .page-section-header",
+                ".page-section, .page-item, .page-section-header, .section-title",
             );
 
             let currentPageBottom = A4_HEIGHT_PX;
@@ -56,10 +56,11 @@ const ClassicTemplate = memo(({ data, currentPage = 1, onPageCountChange }) => {
                 const itemHeight = item.offsetHeight;
                 const itemBottom = itemTop + itemHeight;
 
-                // Determine if this is a section header
+                // Determine if this is a section header/title
                 const isSectionHeader =
-                    item.classList.contains("page-section") ||
-                    item.classList.contains("page-section-header");
+                    item.classList.contains("page-section-header") ||
+                    item.classList.contains("section-title") ||
+                    item.tagName === "H2";
                 const minSpace = isSectionHeader
                     ? MIN_SECTION_SPACE
                     : MIN_ITEM_SPACE;
@@ -169,7 +170,7 @@ const ClassicTemplate = memo(({ data, currentPage = 1, onPageCountChange }) => {
                         {/* Introduction Section */}
                         {hasContent(introduction) && (
                             <section className="mb-6 page-section">
-                                <h2 className="text-lg font-bold text-gray-900 mb-2 pb-1 border-b-2 border-gray-800 uppercase tracking-wide">
+                                <h2 className="text-lg font-bold text-gray-900 mb-2 pb-1 border-b-2 border-gray-800 uppercase tracking-wide section-title">
                                     {introduction.sectionTitle ||
                                         "Professional Summary"}
                                 </h2>
@@ -185,7 +186,7 @@ const ClassicTemplate = memo(({ data, currentPage = 1, onPageCountChange }) => {
                         {/* Professional Skills Section */}
                         {hasContent(professionalSkills) && (
                             <section className="mb-6 page-section">
-                                <h2 className="text-lg font-bold text-gray-900 mb-2 pb-1 border-b-2 border-gray-800 uppercase tracking-wide">
+                                <h2 className="text-lg font-bold text-gray-900 mb-2 pb-1 border-b-2 border-gray-800 uppercase tracking-wide section-title">
                                     {professionalSkills.sectionTitle ||
                                         "Professional Skills"}
                                 </h2>
@@ -217,7 +218,7 @@ const ClassicTemplate = memo(({ data, currentPage = 1, onPageCountChange }) => {
                         {/* Work History Section */}
                         {hasContent(workHistory) && (
                             <section className="mb-6 page-section">
-                                <h2 className="text-lg font-bold text-gray-900 mb-2 pb-1 border-b-2 border-gray-800 uppercase tracking-wide">
+                                <h2 className="text-lg font-bold text-gray-900 mb-2 pb-1 border-b-2 border-gray-800 uppercase tracking-wide section-title">
                                     {workHistory.sectionTitle ||
                                         "Professional Experience"}
                                 </h2>
@@ -259,7 +260,7 @@ const ClassicTemplate = memo(({ data, currentPage = 1, onPageCountChange }) => {
                         {/* Education Section */}
                         {hasContent(educations) && (
                             <section className="mb-6 page-section">
-                                <h2 className="text-lg font-bold text-gray-900 mb-2 pb-1 border-b-2 border-gray-800 uppercase tracking-wide">
+                                <h2 className="text-lg font-bold text-gray-900 mb-2 pb-1 border-b-2 border-gray-800 uppercase tracking-wide section-title">
                                     {educations.sectionTitle || "Education"}
                                 </h2>
                                 <div className="space-y-4">
@@ -294,7 +295,7 @@ const ClassicTemplate = memo(({ data, currentPage = 1, onPageCountChange }) => {
                         {/* Certifications Section */}
                         {hasContent(certifications) && (
                             <section className="mb-6 page-section">
-                                <h2 className="text-lg font-bold text-gray-900 mb-2 pb-1 border-b-2 border-gray-800 uppercase tracking-wide">
+                                <h2 className="text-lg font-bold text-gray-900 mb-2 pb-1 border-b-2 border-gray-800 uppercase tracking-wide section-title">
                                     {certifications.sectionTitle ||
                                         "Certifications"}
                                 </h2>
@@ -343,7 +344,7 @@ const ClassicTemplate = memo(({ data, currentPage = 1, onPageCountChange }) => {
                         {/* Activities Section */}
                         {hasContent(activities) && (
                             <section className="mb-6 page-section">
-                                <h2 className="text-lg font-bold text-gray-900 mb-2 pb-1 border-b-2 border-gray-800 uppercase tracking-wide">
+                                <h2 className="text-lg font-bold text-gray-900 mb-2 pb-1 border-b-2 border-gray-800 uppercase tracking-wide section-title">
                                     {activities.sectionTitle ||
                                         "Activities & Achievements"}
                                 </h2>
@@ -378,7 +379,7 @@ const ClassicTemplate = memo(({ data, currentPage = 1, onPageCountChange }) => {
                         {/* Language Competencies Section */}
                         {hasContent(languageCompetencies) && (
                             <section className="mb-6 page-section">
-                                <h2 className="text-lg font-bold text-gray-900 mb-2 pb-1 border-b-2 border-gray-800 uppercase tracking-wide">
+                                <h2 className="text-lg font-bold text-gray-900 mb-2 pb-1 border-b-2 border-gray-800 uppercase tracking-wide section-title">
                                     {languageCompetencies.sectionTitle ||
                                         "Languages"}
                                 </h2>
