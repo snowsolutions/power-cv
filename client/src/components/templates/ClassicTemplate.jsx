@@ -39,12 +39,30 @@ const ClassicTemplate = memo(({ data, currentPage = 1, onPageCountChange }) => {
             const MIN_SECTION_SPACE = 60; // Space needed for section headers
             const MIN_ITEM_SPACE = 30; // Space needed for regular items
 
-            // Get all breakable items - h2 section headers, h3 job titles, and content items
-            const allItems = Array.from(
-                contentRef.current.querySelectorAll(
-                    "h2.section-title, .page-item, .job-title",
-                ),
+            // Get all breakable items - query separately and combine to prioritize correctly
+            const h2Headers = Array.from(
+                contentRef.current.querySelectorAll("h2.section-title"),
             );
+            const h3JobTitles = Array.from(
+                contentRef.current.querySelectorAll("h3.job-title"),
+            );
+            const pageItems = Array.from(
+                contentRef.current.querySelectorAll(".page-item"),
+            );
+
+            // Combine all items, removing page-items that contain h3 job titles
+            const h3Parents = new Set(
+                h3JobTitles.map((h3) => h3.closest(".page-item")),
+            );
+            const filteredPageItems = pageItems.filter(
+                (item) => !h3Parents.has(item),
+            );
+
+            const allItems = [
+                ...h2Headers,
+                ...h3JobTitles,
+                ...filteredPageItems,
+            ];
 
             console.log(
                 `[ClassicTemplate] Found ${allItems.length} breakable items`,
