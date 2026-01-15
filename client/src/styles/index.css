@@ -236,6 +236,28 @@
     .glass {
         @apply bg-white/70 backdrop-blur-md;
     }
+
+    /* Slide in animation */
+    @keyframes slideInRight {
+        from {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+
+    .animate-slide-in {
+        animation: slideInRight 0.3s ease-out;
+    }
+
+    /* Page break prevention utility */
+    .avoid-page-break {
+        page-break-inside: avoid;
+        break-inside: avoid;
+    }
 }
 
 /* Print styles for CV export */
@@ -254,5 +276,83 @@
 
     .page-break-inside-avoid {
         page-break-inside: avoid;
+    }
+
+    /* Prevent page breaks within sections */
+    section {
+        page-break-inside: avoid;
+        break-inside: avoid;
+    }
+
+    /* Ensure headings stay with content */
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+        page-break-after: avoid;
+        break-after: avoid;
+    }
+
+    /* Prevent page breaks within list items */
+    li {
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+    }
+
+    /* Prevent page breaks within paragraphs */
+    p {
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+    }
+
+    /* Prevent page breaks within divs (work items, education items, etc.) */
+    div[class*="space-y"] > div,
+    div[class*="grid"] > div {
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+    }
+
+    /* Keep bullet points together */
+    ul,
+    ol {
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+    }
+
+    /* Prevent orphans and widows */
+    p {
+        orphans: 3;
+        widows: 3;
+    }
+
+    /* Keep work experience items together */
+    .relative,
+    [class*="border-l"],
+    [class*="bg-gradient"],
+    [class*="bg-gray-"],
+    [class*="bg-purple-"],
+    [class*="bg-pink-"],
+    [class*="bg-blue-"] {
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+    }
+
+    /* Prevent breaks in formatted descriptions */
+    .formatted-description,
+    .formatted-description ul,
+    .formatted-description li {
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+    }
+
+    /* Apply to all template content items */
+    .modern-template > * > * > div,
+    .classic-template > * > div,
+    .creative-template > * > * > div,
+    .minimal-template > * > div {
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
     }
 }

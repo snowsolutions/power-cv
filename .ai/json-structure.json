@@ -1,0 +1,94 @@
+{
+  "version": "1.0.0",
+  "exportDate": "2026-01-15T00:00:00.000Z",
+  "cv": {
+    "id": "uuid-string-here",
+    "name": "CV Name",
+    "template": "modern",
+    "data": {
+      "personalInfo": {
+        "sectionTitle": "Personal Information",
+        "name": "",
+        "email": "",
+        "phone": "",
+        "address": "",
+        "avatar": ""
+      },
+      "introduction": {
+        "sectionTitle": "Introduction",
+        "content": ""
+      },
+      "workHistory": {
+        "sectionTitle": "Work History",
+        "items": [
+          {
+            "id": "uuid-string",
+            "dateFrom": "YYYY-MM",
+            "dateTo": "YYYY-MM",
+            "companyName": "",
+            "position": "",
+            "description": ""
+          }
+        ]
+      },
+      "certifications": {
+        "sectionTitle": "Certifications",
+        "items": [
+          {
+            "id": "uuid-string",
+            "certName": "",
+            "organization": "",
+            "certLink": "",
+            "certExpiration": "YYYY-MM-DD"
+          }
+        ]
+      },
+      "educations": {
+        "sectionTitle": "Education",
+        "items": [
+          {
+            "id": "uuid-string",
+            "schoolName": "",
+            "studyFrom": "YYYY-MM",
+            "studyTo": "YYYY-MM",
+            "profession": ""
+          }
+        ]
+      },
+      "activities": {
+        "sectionTitle": "Activities",
+        "items": [
+          {
+            "id": "uuid-string",
+            "title": "",
+            "description": "",
+            "date": "YYYY-MM"
+          }
+        ]
+      },
+      "professionalSkills": {
+        "sectionTitle": "Professional Skills",
+        "items": [
+          {
+            "id": "uuid-string",
+            "skillName": "",
+            "level": "Beginner|Intermediate|Advanced|Expert",
+            "description": ""
+          }
+        ]
+      },
+      "languageCompetencies": {
+        "sectionTitle": "Language Competencies",
+        "items": [
+          {
+            "id": "uuid-string",
+            "language": "",
+            "proficiency": "Basic|Intermediate|Professional|Fluent|Native"
+          }
+        ]
+      }
+    },
+    "createdAt": "2026-01-15T00:00:00.000Z",
+    "updatedAt": "2026-01-15T00:00:00.000Z"
+  }
+}

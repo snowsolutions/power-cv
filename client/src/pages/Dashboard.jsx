@@ -11,7 +11,6 @@ function Dashboard() {
         loadAllCVs,
         deleteCVFromBackend,
         createNewCV,
-        loadCVFromBackend,
         isLoading,
         error,
         clearError,
@@ -19,10 +18,12 @@ function Dashboard() {
 
     const [deleteConfirm, setDeleteConfirm] = useState(null);
     const [statusMessage, setStatusMessage] = useState(null);
+    const [searchTerm, setSearchTerm] = useState("");
+    const [filterTemplate, setFilterTemplate] = useState("all");
 
     useEffect(() => {
         loadAllCVs();
-    }, []);
+    }, [loadAllCVs]);
 
     const handleCreateNew = () => {
         createNewCV();
@@ -87,6 +88,54 @@ function Dashboard() {
         }
     };
 
+    const handleDuplicateCV = async (cv) => {
+        try {
+            // Load full CV data from backend
+            const response = await cvService.getCVById(cv.id);
+            if (response.success) {
+                const cvData = response.data;
+                // Create new CV with duplicated data
+                const newCVData = {
+                    ...cvData,
+                    name: `${cvData.name} (Copy)`,
+                    id: undefined, // Remove ID so backend creates new one
+                };
+
+                // Save the duplicated CV
+                const saveResult = await cvService.saveCV(newCVData);
+                if (saveResult.success) {
+                    setStatusMessage({
+                        type: "success",
+                        text: `CV duplicated successfully!`,
+                    });
+                    setTimeout(() => setStatusMessage(null), 3000);
+                    // Reload CVs to show the new one
+                    loadAllCVs();
+                } else {
+                    throw new Error(saveResult.error);
+                }
+            }
+        } catch (error) {
+            setStatusMessage({
+                type: "error",
+                text: "Failed to duplicate CV",
+            });
+        }
+    };
+
+    // Filter CVs based on search and template filter
+    const filteredCVs = savedCVs.filter((cv) => {
+        const matchesSearch = cv.name
+            .toLowerCase()
+            .includes(searchTerm.toLowerCase());
+        const matchesTemplate =
+            filterTemplate === "all" || cv.template === filterTemplate;
+        return matchesSearch && matchesTemplate;
+    });
+
+    // Get unique templates for filter
+    const availableTemplates = [...new Set(savedCVs.map((cv) => cv.template))];
+
     return (
         <div className="min-h-screen bg-gray-50 py-8">
             <div className="container mx-auto px-4">
@@ -125,7 +174,7 @@ function Dashboard() {
                 )}
 
                 {/* Action Buttons */}
-                <div className="mb-6 flex gap-4">
+                <div className="mb-6 flex flex-wrap gap-4">
                     <button
                         onClick={handleCreateNew}
                         className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
@@ -139,6 +188,48 @@ function Dashboard() {
                         Back to Home
                     </Link>
                 </div>
+
+                {/* Search and Filter */}
+                {!isLoading && savedCVs.length > 0 && (
+                    <div className="mb-6 flex flex-wrap gap-4">
+                        <div className="flex-grow max-w-md">
+                            <input
+                                type="text"
+                                placeholder="Search CVs by name..."
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            />
+                        </div>
+                        <div>
+                            <select
+                                value={filterTemplate}
+                                onChange={(e) =>
+                                    setFilterTemplate(e.target.value)
+                                }
+                                className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            >
+                                <option value="all">All Templates</option>
+                                {availableTemplates.map((template) => (
+                                    <option key={template} value={template}>
+                                        {template.charAt(0).toUpperCase() +
+                                            template.slice(1)}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+                    </div>
+                )}
+
+                {/* Filtered Results Count */}
+                {!isLoading &&
+                    savedCVs.length > 0 &&
+                    filteredCVs.length !== savedCVs.length && (
+                        <div className="mb-4 text-gray-600">
+                            Showing {filteredCVs.length} of {savedCVs.length}{" "}
+                            CVs
+                        </div>
+                    )}
 
                 {/* Loading State */}
                 {isLoading && (
@@ -165,9 +256,31 @@ function Dashboard() {
                     </div>
                 )}
 
-                {!isLoading && savedCVs.length > 0 && (
+                {!isLoading &&
+                    savedCVs.length > 0 &&
+                    filteredCVs.length === 0 && (
+                        <div className="bg-white rounded-lg shadow-md p-12 text-center">
+                            <p className="text-2xl text-gray-600 mb-4">
+                                🔍 No CVs found
+                            </p>
+                            <p className="text-gray-500 mb-6">
+                                Try adjusting your search or filter criteria
+                            </p>
+                            <button
+                                onClick={() => {
+                                    setSearchTerm("");
+                                    setFilterTemplate("all");
+                                }}
+                                className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+                            >
+                                Clear Filters
+                            </button>
+                        </div>
+                    )}
+
+                {!isLoading && filteredCVs.length > 0 && (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {savedCVs.map((cv) => (
+                        {filteredCVs.map((cv) => (
                             <div
                                 key={cv.id}
                                 className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow overflow-hidden"
@@ -195,6 +308,15 @@ function Dashboard() {
                                         </button>
                                         <button
                                             onClick={() =>
+                                                handleDuplicateCV(cv)
+                                            }
+                                            className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-sm font-medium"
+                                            title="Duplicate CV"
+                                        >
+                                            📋
+                                        </button>
+                                        <button
+                                            onClick={() =>
                                                 handleExportCV(cv.id)
                                             }
                                             className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm font-medium"
@@ -207,6 +329,7 @@ function Dashboard() {
                                                 handleDeleteClick(cv)
                                             }
                                             className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm font-medium"
+                                            title="Delete CV"
                                         >
                                             🗑️
                                         </button>
@@ -225,11 +348,11 @@ function Dashboard() {
                                 Confirm Delete
                             </h3>
                             <p className="text-gray-600 mb-6">
-                                Are you sure you want to delete "
+                                Are you sure you want to delete &quot;
                                 <span className="font-medium">
                                     {deleteConfirm.name}
                                 </span>
-                                "? This action cannot be undone.
+                                &quot;? This action cannot be undone.
                             </p>
                             <div className="flex gap-3">
                                 <button

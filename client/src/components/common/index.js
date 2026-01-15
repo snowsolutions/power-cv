@@ -8,3 +8,5 @@ export { default as Select } from "./Select";
 export { default as Modal } from "./Modal";
 export { default as Loader } from "./Loader";
 export { default as SectionTitleEditor } from "./SectionTitleEditor";
+export { default as ValidatedInput } from "./ValidatedInput";
+export { default as FormattedDescription } from "./FormattedDescription";

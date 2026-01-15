@@ -1,0 +1,5 @@
+- Use pnpm
+- Run "pnpm run build" on your own to make sure stuff work
+- Use `git status` to check files changed
+- Use `git add` `git commit -m""` `git push` to push change to git, commit message format: "[Task ID] [Type: Feature, Fix Bug, ...] [Shortly brief what we have done so far]"
+- Check .ai/task-management.md to see what is the last change

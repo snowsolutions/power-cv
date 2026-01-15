@@ -1,7 +1,12 @@
 import { useState, useEffect } from "react";
 import PropTypes from "prop-types";
-import { Input, SectionTitleEditor } from "../common";
+import { SectionTitleEditor, ValidatedInput } from "../common";
 import { DEFAULT_SECTION_TITLES } from "../../utils/constants";
+import {
+    validateEmail,
+    validatePhone,
+    validateText,
+} from "../../utils/validation";
 
 const PersonalInfoForm = ({ personalInfo, onUpdate, onUpdateSectionTitle }) => {
     const [avatarPreview, setAvatarPreview] = useState(
@@ -135,44 +140,66 @@ const PersonalInfoForm = ({ personalInfo, onUpdate, onUpdateSectionTitle }) => {
                 {/* Personal Info Fields */}
                 <div className="flex-grow w-full">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <Input
+                        <ValidatedInput
                             label="Full Name"
-                            value={personalInfo.name}
+                            value={personalInfo.name || ""}
                             onChange={(e) =>
                                 handleFieldChange("name", e.target.value)
                             }
                             placeholder="John Doe"
                             required
+                            validate={(value) => {
+                                if (!value || value.trim() === "") {
+                                    return {
+                                        isValid: false,
+                                        error: "Name is required",
+                                    };
+                                }
+                                if (value.trim().length < 2) {
+                                    return {
+                                        isValid: false,
+                                        error: "Name must be at least 2 characters",
+                                    };
+                                }
+                                return { isValid: true };
+                            }}
+                            showValidIcon={true}
                         />
 
-                        <Input
-                            label="Email Address"
+                        <ValidatedInput
+                            label="Email"
                             type="email"
-                            value={personalInfo.email}
+                            value={personalInfo.email || ""}
                             onChange={(e) =>
                                 handleFieldChange("email", e.target.value)
                             }
                             placeholder="john.doe@example.com"
-                            required
+                            validate={validateEmail}
+                            showValidIcon={true}
                         />
 
-                        <Input
-                            label="Phone Number"
+                        <ValidatedInput
+                            label="Phone"
                             type="tel"
-                            value={personalInfo.phone}
+                            value={personalInfo.phone || ""}
                             onChange={(e) =>
                                 handleFieldChange("phone", e.target.value)
                             }
                             placeholder="+1 (555) 123-4567"
+                            validate={validatePhone}
+                            showValidIcon={true}
                         />
 
-                        <Input
+                        <ValidatedInput
                             label="Address"
-                            value={personalInfo.address}
+                            value={personalInfo.address || ""}
                             onChange={(e) =>
                                 handleFieldChange("address", e.target.value)
                             }
                             placeholder="City, Country"
+                            validate={(value) =>
+                                validateText(value, "Address", 200)
+                            }
                         />
                     </div>
                 </div>

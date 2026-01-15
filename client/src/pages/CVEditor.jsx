@@ -35,6 +35,7 @@ function CVEditor() {
         isPreviewVisible,
         togglePreview,
         selectedTemplate,
+        setTemplate,
         saveCV,
         loadCVFromBackend,
         isLoading,
@@ -141,47 +142,49 @@ function CVEditor() {
     };
 
     return (
-        <div className="min-h-screen bg-gray-50 py-8">
-            <div className="container mx-auto px-4">
+        <div className="min-h-screen bg-gray-50">
+            <div className="w-full">
                 {/* Header Section */}
-                <div className="mb-8">
-                    <h1 className="text-4xl font-bold text-gray-900">
-                        {isEditMode ? "Edit CV" : "Create New CV"}
-                    </h1>
-                    {isEditMode && (
-                        <p className="text-lg text-gray-600 mt-2">
-                            Editing CV ID: {id}
-                        </p>
-                    )}
-                    <div className="flex items-center gap-4 mt-4">
-                        <input
-                            type="text"
-                            value={currentCV.name}
-                            onChange={(e) => setCVName(e.target.value)}
-                            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                            placeholder="Enter CV name"
-                        />
-                        {isDirty && (
-                            <span className="px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-sm font-medium">
-                                Unsaved changes
-                            </span>
-                        )}
-                        <div className="flex gap-2">
+                <div className="bg-white border-b border-gray-200 px-6 py-4 sticky top-0 z-20">
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <h1 className="text-2xl font-bold text-gray-900">
+                                {isEditMode ? "Edit CV" : "Create New CV"}
+                            </h1>
+                            {isEditMode && (
+                                <p className="text-sm text-gray-500 mt-1">
+                                    ID: {id}
+                                </p>
+                            )}
+                        </div>
+                        <div className="flex items-center gap-3">
+                            <input
+                                type="text"
+                                value={currentCV.name}
+                                onChange={(e) => setCVName(e.target.value)}
+                                className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent w-64"
+                                placeholder="Enter CV name"
+                            />
+                            {isDirty && (
+                                <span className="px-3 py-1.5 bg-yellow-100 text-yellow-800 rounded-full text-xs font-medium">
+                                    Unsaved
+                                </span>
+                            )}
                             <button
                                 onClick={handleSave}
                                 disabled={isLoading}
-                                className={`px-6 py-2 rounded-lg font-medium transition-colors ${
+                                className={`px-5 py-2 rounded-lg font-medium transition-colors text-sm ${
                                     isLoading
                                         ? "bg-gray-400 cursor-not-allowed"
                                         : "bg-blue-600 hover:bg-blue-700 text-white"
                                 }`}
                             >
-                                {isLoading ? "Saving..." : "Save CV"}
+                                {isLoading ? "Saving..." : "Save"}
                             </button>
                             <button
                                 onClick={handleExport}
                                 disabled={isLoading}
-                                className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium disabled:bg-gray-400"
+                                className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium disabled:bg-gray-400 text-sm"
                                 title="Export as JSON"
                             >
                                 📥 Export
@@ -189,40 +192,54 @@ function CVEditor() {
                             <button
                                 onClick={handleImportClick}
                                 disabled={isLoading}
-                                className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-medium disabled:bg-gray-400"
+                                className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-medium disabled:bg-gray-400 text-sm"
                                 title="Import from JSON"
                             >
                                 📤 Import
                             </button>
+                            <Link
+                                to="/dashboard"
+                                className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors text-sm font-medium"
+                            >
+                                Dashboard
+                            </Link>
                         </div>
-                        <input
-                            ref={fileInputRef}
-                            type="file"
-                            accept=".json,application/json"
-                            onChange={handleFileSelect}
-                            className="hidden"
-                        />
                     </div>
+                    <input
+                        ref={fileInputRef}
+                        type="file"
+                        accept=".json,application/json"
+                        onChange={handleFileSelect}
+                        className="hidden"
+                    />
+                </div>
 
-                    {/* Status Messages */}
-                    {saveMessage && (
+                {/* Status Messages - Fixed Position */}
+                {saveMessage && (
+                    <div className="fixed top-20 right-6 z-30 animate-slide-in">
                         <div
-                            className={`mt-4 p-4 rounded-lg ${
+                            className={`px-4 py-3 rounded-lg shadow-lg ${
                                 saveMessage.type === "success"
                                     ? "bg-green-100 text-green-800 border border-green-200"
                                     : "bg-red-100 text-red-800 border border-red-200"
                             }`}
                         >
-                            <p className="font-medium">{saveMessage.text}</p>
+                            <p className="font-medium text-sm">
+                                {saveMessage.text}
+                            </p>
                         </div>
-                    )}
+                    </div>
+                )}
 
-                    {error && (
-                        <div className="mt-4 p-4 rounded-lg bg-red-100 text-red-800 border border-red-200">
-                            <p className="font-medium">Error: {error}</p>
+                {error && (
+                    <div className="fixed top-20 right-6 z-30">
+                        <div className="px-4 py-3 rounded-lg bg-red-100 text-red-800 border border-red-200 shadow-lg">
+                            <p className="font-medium text-sm">
+                                Error: {error}
+                            </p>
                         </div>
-                    )}
-                </div>
+                    </div>
+                )}
 
                 {/* Loading Overlay */}
                 {isLoading && (
@@ -238,10 +255,10 @@ function CVEditor() {
                     </div>
                 )}
 
-                {/* Editor Layout */}
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                    {/* Left Column - Form */}
-                    <div className="space-y-6">
+                {/* Editor Layout - Full Width Two Column */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 h-[calc(100vh-80px)]">
+                    {/* Left Column - Form - Scrollable */}
+                    <div className="overflow-y-auto px-6 py-6 space-y-6 bg-white border-r border-gray-200">
                         <PersonalInfoForm
                             personalInfo={currentCV.data.personalInfo}
                             onUpdate={updatePersonalInfo}
@@ -307,36 +324,23 @@ function CVEditor() {
                         />
                     </div>
 
-                    {/* Right Column - Preview */}
-                    <div className="lg:sticky lg:top-24 self-start print:hidden">
-                        <CVPreview
-                            data={currentCV.data}
-                            template={selectedTemplate}
-                            isVisible={isPreviewVisible}
-                            onToggleVisibility={togglePreview}
-                        />
+                    {/* Right Column - Preview - Sticky and Scrollable */}
+                    <div className="overflow-y-auto bg-gray-50 print:hidden">
+                        <div className="h-full">
+                            <CVPreview
+                                data={currentCV.data}
+                                template={selectedTemplate}
+                                isVisible={isPreviewVisible}
+                                onToggleVisibility={togglePreview}
+                                onTemplateChange={setTemplate}
+                            />
+                        </div>
                     </div>
                 </div>
 
                 {/* Print-only view */}
                 <div className="hidden print:block">
                     <ModernTemplate data={currentCV.data} />
-                </div>
-
-                {/* Action Buttons */}
-                <div className="mt-8 flex gap-4 print:hidden">
-                    <Link
-                        to="/dashboard"
-                        className="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors"
-                    >
-                        Back to Dashboard
-                    </Link>
-                    <Link
-                        to="/"
-                        className="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors"
-                    >
-                        Back to Home
-                    </Link>
                 </div>
 
                 {/* Import Confirmation Modal */}

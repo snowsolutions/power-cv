@@ -1,5 +1,6 @@
 import { memo } from "react";
 import PropTypes from "prop-types";
+import { FormattedDescription } from "../common";
 
 /**
  * Modern CV Template - Professional two-column layout
@@ -28,91 +29,94 @@ const ModernTemplate = memo(({ data }) => {
     };
 
     return (
-        <div className="modern-template bg-white shadow-lg rounded-lg overflow-hidden print:shadow-none print:rounded-none">
-            {/* Header Section */}
-            <div className="bg-gradient-to-r from-blue-600 to-blue-800 text-white p-8 print:p-6">
-                <div className="flex flex-col md:flex-row items-center gap-6">
-                    {/* Avatar */}
-                    {personalInfo.avatar && (
-                        <div className="flex-shrink-0">
-                            <img
-                                src={personalInfo.avatar}
-                                alt={personalInfo.name}
-                                className="w-32 h-32 rounded-full border-4 border-white object-cover shadow-lg"
-                            />
-                        </div>
-                    )}
+        <div className="modern-template bg-white shadow-lg rounded-lg overflow-hidden print:shadow-none print:rounded-none max-w-[210mm] mx-auto print:max-w-full">
+            {/* A4 Size Container - 210mm x 297mm */}
+            <div className="min-h-[297mm] print:min-h-0">
+                {/* Header Section */}
+                <div className="bg-gradient-to-r from-blue-600 to-blue-800 text-white px-8 py-6 print:px-12 print:py-8">
+                    <div className="flex flex-col md:flex-row items-center gap-6">
+                        {/* Avatar */}
+                        {personalInfo.avatar && (
+                            <div className="flex-shrink-0">
+                                <img
+                                    src={personalInfo.avatar}
+                                    alt={personalInfo.name}
+                                    className="w-32 h-32 rounded-full border-4 border-white object-cover shadow-lg"
+                                />
+                            </div>
+                        )}
 
-                    {/* Personal Info */}
-                    <div className="flex-grow text-center md:text-left">
-                        <h1 className="text-4xl font-bold mb-2">
-                            {personalInfo.name || "Your Name"}
-                        </h1>
-                        <div className="space-y-1 text-blue-100">
-                            {personalInfo.email && (
-                                <div className="flex items-center justify-center md:justify-start gap-2">
-                                    <svg
-                                        className="w-4 h-4"
-                                        fill="none"
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth="2"
-                                        viewBox="0 0 24 24"
-                                        stroke="currentColor"
-                                    >
-                                        <path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                                    </svg>
-                                    <span>{personalInfo.email}</span>
-                                </div>
-                            )}
-                            {personalInfo.phone && (
-                                <div className="flex items-center justify-center md:justify-start gap-2">
-                                    <svg
-                                        className="w-4 h-4"
-                                        fill="none"
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth="2"
-                                        viewBox="0 0 24 24"
-                                        stroke="currentColor"
-                                    >
-                                        <path d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                                    </svg>
-                                    <span>{personalInfo.phone}</span>
-                                </div>
-                            )}
-                            {personalInfo.address && (
-                                <div className="flex items-center justify-center md:justify-start gap-2">
-                                    <svg
-                                        className="w-4 h-4"
-                                        fill="none"
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth="2"
-                                        viewBox="0 0 24 24"
-                                        stroke="currentColor"
-                                    >
-                                        <path d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                                        <path d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                                    </svg>
-                                    <span>{personalInfo.address}</span>
-                                </div>
-                            )}
+                        {/* Personal Info */}
+                        <div className="flex-grow text-center md:text-left">
+                            <h1 className="text-4xl font-bold mb-2">
+                                {personalInfo.name || "Your Name"}
+                            </h1>
+                            <div className="space-y-1 text-blue-100">
+                                {personalInfo.email && (
+                                    <div className="flex items-center justify-center md:justify-start gap-2">
+                                        <svg
+                                            className="w-4 h-4"
+                                            fill="none"
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            strokeWidth="2"
+                                            viewBox="0 0 24 24"
+                                            stroke="currentColor"
+                                        >
+                                            <path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                        </svg>
+                                        <span>{personalInfo.email}</span>
+                                    </div>
+                                )}
+                                {personalInfo.phone && (
+                                    <div className="flex items-center justify-center md:justify-start gap-2">
+                                        <svg
+                                            className="w-4 h-4"
+                                            fill="none"
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            strokeWidth="2"
+                                            viewBox="0 0 24 24"
+                                            stroke="currentColor"
+                                        >
+                                            <path d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                                        </svg>
+                                        <span>{personalInfo.phone}</span>
+                                    </div>
+                                )}
+                                {personalInfo.address && (
+                                    <div className="flex items-center justify-center md:justify-start gap-2">
+                                        <svg
+                                            className="w-4 h-4"
+                                            fill="none"
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            strokeWidth="2"
+                                            viewBox="0 0 24 24"
+                                            stroke="currentColor"
+                                        >
+                                            <path d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                            <path d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                        </svg>
+                                        <span>{personalInfo.address}</span>
+                                    </div>
+                                )}
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
 
             {/* Main Content */}
-            <div className="p-8 print:p-6">
+            <div className="px-8 py-6 print:px-12 print:py-8 space-y-6">
                 {/* Introduction Section */}
                 {hasContent(introduction) && (
-                    <section className="mb-8">
-                        <h2 className="text-2xl font-bold text-gray-800 mb-4 pb-2 border-b-2 border-blue-600">
+                    <section className="mb-6">
+                        <h2 className="text-xl font-bold text-gray-800 mb-3 pb-2 border-b-2 border-blue-600">
                             {introduction.sectionTitle || "Introduction"}
                         </h2>
                         <div
-                            className="prose prose-sm max-w-none text-gray-700 leading-relaxed"
+                            className="prose prose-sm max-w-none text-gray-700 leading-relaxed text-justify"
                             dangerouslySetInnerHTML={{
                                 __html: introduction.content,
                             }}
@@ -122,22 +126,22 @@ const ModernTemplate = memo(({ data }) => {
 
                 {/* Work History Section */}
                 {hasContent(workHistory) && (
-                    <section className="mb-8">
-                        <h2 className="text-2xl font-bold text-gray-800 mb-4 pb-2 border-b-2 border-blue-600">
+                    <section className="mb-6">
+                        <h2 className="text-xl font-bold text-gray-800 mb-3 pb-2 border-b-2 border-blue-600">
                             {workHistory.sectionTitle || "Work History"}
                         </h2>
-                        <div className="space-y-6">
+                        <div className="space-y-4">
                             {workHistory.items.map((work) => (
                                 <div
                                     key={work.id}
-                                    className="relative pl-8 border-l-2 border-blue-300"
+                                    className="relative pl-6 border-l-2 border-blue-300 avoid-page-break"
                                 >
-                                    <div className="absolute -left-2 top-0 w-4 h-4 rounded-full bg-blue-600"></div>
-                                    <div className="mb-1">
-                                        <h3 className="text-lg font-semibold text-gray-800">
+                                    <div className="absolute -left-2 top-1 w-4 h-4 rounded-full bg-blue-600"></div>
+                                    <div className="mb-2">
+                                        <h3 className="text-base font-semibold text-gray-800">
                                             {work.position}
                                         </h3>
-                                        <p className="text-md font-medium text-blue-600">
+                                        <p className="text-sm font-medium text-blue-600">
                                             {work.companyName}
                                         </p>
                                         <p className="text-sm text-gray-500">
@@ -146,9 +150,10 @@ const ModernTemplate = memo(({ data }) => {
                                         </p>
                                     </div>
                                     {work.description && (
-                                        <p className="text-gray-700 leading-relaxed mt-2">
-                                            {work.description}
-                                        </p>
+                                        <FormattedDescription
+                                            text={work.description}
+                                            className="text-sm text-gray-700 leading-relaxed mt-2"
+                                        />
                                     )}
                                 </div>
                             ))}
@@ -158,29 +163,26 @@ const ModernTemplate = memo(({ data }) => {
 
                 {/* Education Section */}
                 {hasContent(educations) && (
-                    <section className="mb-8">
-                        <h2 className="text-2xl font-bold text-gray-800 mb-4 pb-2 border-b-2 border-blue-600">
+                    <section className="mb-6">
+                        <h2 className="text-xl font-bold text-gray-800 mb-3 pb-2 border-b-2 border-blue-600">
                             {educations.sectionTitle || "Education"}
                         </h2>
-                        <div className="space-y-4">
+                        <div className="space-y-3">
                             {educations.items.map((edu) => (
                                 <div
                                     key={edu.id}
-                                    className="relative pl-8 border-l-2 border-blue-300"
+                                    className="border-l-4 border-blue-600 pl-4 avoid-page-break"
                                 >
-                                    <div className="absolute -left-2 top-0 w-4 h-4 rounded-full bg-blue-600"></div>
-                                    <div>
-                                        <h3 className="text-lg font-semibold text-gray-800">
-                                            {edu.profession}
-                                        </h3>
-                                        <p className="text-md font-medium text-blue-600">
-                                            {edu.schoolName}
-                                        </p>
-                                        <p className="text-sm text-gray-500">
-                                            {edu.studyFrom} -{" "}
-                                            {edu.studyTo || "Present"}
-                                        </p>
-                                    </div>
+                                    <h3 className="text-base font-semibold text-gray-800">
+                                        {edu.profession}
+                                    </h3>
+                                    <p className="text-sm font-medium text-blue-600">
+                                        {edu.schoolName}
+                                    </p>
+                                    <p className="text-sm text-gray-500">
+                                        {edu.studyFrom} -{" "}
+                                        {edu.studyTo || "Present"}
+                                    </p>
                                 </div>
                             ))}
                         </div>
@@ -189,15 +191,15 @@ const ModernTemplate = memo(({ data }) => {
 
                 {/* Certifications Section */}
                 {hasContent(certifications) && (
-                    <section className="mb-8">
-                        <h2 className="text-2xl font-bold text-gray-800 mb-4 pb-2 border-b-2 border-blue-600">
+                    <section className="mb-6">
+                        <h2 className="text-xl font-bold text-gray-800 mb-3 pb-2 border-b-2 border-blue-600">
                             {certifications.sectionTitle || "Certifications"}
                         </h2>
-                        <div className="space-y-4">
+                        <div className="space-y-3">
                             {certifications.items.map((cert) => (
                                 <div
                                     key={cert.id}
-                                    className="flex items-start gap-3"
+                                    className="flex items-start gap-3 avoid-page-break"
                                 >
                                     <div className="flex-shrink-0 mt-1">
                                         <svg
@@ -213,10 +215,10 @@ const ModernTemplate = memo(({ data }) => {
                                         </svg>
                                     </div>
                                     <div className="flex-grow">
-                                        <h3 className="text-lg font-semibold text-gray-800">
+                                        <h3 className="text-base font-semibold text-gray-800">
                                             {cert.certName}
                                         </h3>
-                                        <p className="text-md text-blue-600">
+                                        <p className="text-sm text-blue-600">
                                             {cert.organization}
                                         </p>
                                         {cert.certExpiration && (
@@ -254,13 +256,16 @@ const ModernTemplate = memo(({ data }) => {
 
                 {/* Activities Section */}
                 {hasContent(activities) && (
-                    <section className="mb-8">
-                        <h2 className="text-2xl font-bold text-gray-800 mb-4 pb-2 border-b-2 border-blue-600">
+                    <section className="mb-6">
+                        <h2 className="text-xl font-bold text-gray-800 mb-3 pb-2 border-b-2 border-blue-600">
                             {activities.sectionTitle || "Activities"}
                         </h2>
-                        <div className="space-y-4">
+                        <div className="space-y-3">
                             {activities.items.map((activity) => (
-                                <div key={activity.id}>
+                                <div
+                                    key={activity.id}
+                                    className="avoid-page-break"
+                                >
                                     <h3 className="text-lg font-semibold text-gray-800">
                                         {activity.title}
                                     </h3>
@@ -270,9 +275,10 @@ const ModernTemplate = memo(({ data }) => {
                                         </p>
                                     )}
                                     {activity.description && (
-                                        <p className="text-gray-700 leading-relaxed">
-                                            {activity.description}
-                                        </p>
+                                        <FormattedDescription
+                                            text={activity.description}
+                                            className="text-sm text-gray-700 leading-relaxed mt-2"
+                                        />
                                     )}
                                 </div>
                             ))}
@@ -282,8 +288,8 @@ const ModernTemplate = memo(({ data }) => {
 
                 {/* Professional Skills Section */}
                 {hasContent(professionalSkills) && (
-                    <section className="mb-8">
-                        <h2 className="text-2xl font-bold text-gray-800 mb-4 pb-2 border-b-2 border-blue-600">
+                    <section className="mb-6">
+                        <h2 className="text-xl font-bold text-gray-800 mb-3 pb-2 border-b-2 border-blue-600">
                             {professionalSkills.sectionTitle ||
                                 "Professional Skills"}
                         </h2>
@@ -321,8 +327,8 @@ const ModernTemplate = memo(({ data }) => {
 
                 {/* Language Competencies Section */}
                 {hasContent(languageCompetencies) && (
-                    <section className="mb-8">
-                        <h2 className="text-2xl font-bold text-gray-800 mb-4 pb-2 border-b-2 border-blue-600">
+                    <section className="mb-6">
+                        <h2 className="text-xl font-bold text-gray-800 mb-3 pb-2 border-b-2 border-blue-600">
                             {languageCompetencies.sectionTitle ||
                                 "Language Competencies"}
                         </h2>
