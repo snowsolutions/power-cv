@@ -36,7 +36,8 @@ const ClassicTemplate = memo(({ data, currentPage = 1, onPageCountChange }) => {
     useEffect(() => {
         if (contentRef.current) {
             const A4_HEIGHT_PX = 1122; // 297mm at 96 DPI
-            const MIN_ITEM_SPACE = 100; // Minimum space needed at bottom to keep item on page
+            const MIN_SECTION_SPACE = 80; // Space needed for section headers
+            const MIN_ITEM_SPACE = 40; // Space needed for regular items
 
             // Get all breakable items
             const items = contentRef.current.querySelectorAll(
@@ -55,6 +56,14 @@ const ClassicTemplate = memo(({ data, currentPage = 1, onPageCountChange }) => {
                 const itemHeight = item.offsetHeight;
                 const itemBottom = itemTop + itemHeight;
 
+                // Determine if this is a section header
+                const isSectionHeader =
+                    item.classList.contains("page-section") ||
+                    item.classList.contains("page-section-header");
+                const minSpace = isSectionHeader
+                    ? MIN_SECTION_SPACE
+                    : MIN_ITEM_SPACE;
+
                 // Check if item would cross page boundary
                 if (
                     itemTop < currentPageBottom &&
@@ -63,11 +72,14 @@ const ClassicTemplate = memo(({ data, currentPage = 1, onPageCountChange }) => {
                     // Item would be cut - check if we have space for it
                     const spaceLeft = currentPageBottom - itemTop;
 
+                    // For section headers, always push to next page if they would be cut
+                    // For items, push if less than minimum space or item is tall
                     if (
-                        spaceLeft < MIN_ITEM_SPACE ||
-                        itemHeight > MIN_ITEM_SPACE
+                        isSectionHeader ||
+                        spaceLeft < minSpace ||
+                        itemHeight > minSpace * 2
                     ) {
-                        // Not enough space or item is too big - push to next page
+                        // Push to next page
                         const pushDistance = currentPageBottom - itemTop;
                         item.style.marginTop = `${pushDistance}px`;
                         item.classList.add("force-page-break");
