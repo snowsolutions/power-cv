@@ -31,9 +31,9 @@ const ClassicTemplate = memo(({ data }) => {
     return (
         <div className="classic-template bg-white shadow-lg rounded-lg overflow-hidden print:shadow-none print:rounded-none max-w-[210mm] mx-auto print:max-w-full">
             {/* A4 Size Container - 210mm x 297mm */}
-            <div className="min-h-[297mm] print:min-h-0">
+            <div className="min-h-[297mm] print:min-h-0 p-0">
                 {/* Header Section - Centered Traditional Style */}
-                <div className="border-b-4 border-gray-800 px-8 py-6 print:px-12 print:py-8 text-center">
+                <div className="border-b-4 border-gray-800 px-8 py-6 print:px-12 print:py-8 text-center avoid-page-break">
                     <h1 className="text-3xl font-bold text-gray-900 mb-3 uppercase tracking-wide">
                         {personalInfo.name || "Your Name"}
                     </h1>
@@ -74,10 +74,10 @@ const ClassicTemplate = memo(({ data }) => {
                 </div>
 
                 {/* Main Content - Single Column */}
-                <div className="px-8 py-6 print:px-12 print:py-8 space-y-5">
+                <div className="px-8 py-6 print:px-12 print:py-8 space-y-6">
                     {/* Introduction Section */}
                     {hasContent(introduction) && (
-                        <section className="mb-5">
+                        <section className="mb-6 avoid-page-break">
                             <h2 className="text-lg font-bold text-gray-900 mb-2 pb-1 border-b-2 border-gray-800 uppercase tracking-wide">
                                 {introduction.sectionTitle ||
                                     "Professional Summary"}
@@ -93,7 +93,7 @@ const ClassicTemplate = memo(({ data }) => {
 
                     {/* Professional Skills Section */}
                     {hasContent(professionalSkills) && (
-                        <section className="mb-5">
+                        <section className="mb-6 avoid-page-break">
                             <h2 className="text-lg font-bold text-gray-900 mb-2 pb-1 border-b-2 border-gray-800 uppercase tracking-wide">
                                 {professionalSkills.sectionTitle ||
                                     "Professional Skills"}
@@ -125,16 +125,16 @@ const ClassicTemplate = memo(({ data }) => {
 
                     {/* Work History Section */}
                     {hasContent(workHistory) && (
-                        <section className="mb-5">
+                        <section className="mb-6">
                             <h2 className="text-lg font-bold text-gray-900 mb-2 pb-1 border-b-2 border-gray-800 uppercase tracking-wide">
                                 {workHistory.sectionTitle ||
                                     "Professional Experience"}
                             </h2>
-                            <div className="space-y-4">
+                            <div className="space-y-5">
                                 {workHistory.items.map((work) => (
                                     <div
                                         key={work.id}
-                                        className="avoid-page-break"
+                                        className="avoid-page-break pb-3"
                                     >
                                         <div className="flex justify-between items-start mb-1">
                                             <div className="flex-grow">
@@ -166,15 +166,15 @@ const ClassicTemplate = memo(({ data }) => {
 
                     {/* Education Section */}
                     {hasContent(educations) && (
-                        <section className="mb-5">
+                        <section className="mb-6">
                             <h2 className="text-lg font-bold text-gray-900 mb-2 pb-1 border-b-2 border-gray-800 uppercase tracking-wide">
                                 {educations.sectionTitle || "Education"}
                             </h2>
-                            <div className="space-y-3">
+                            <div className="space-y-4">
                                 {educations.items.map((edu) => (
                                     <div
                                         key={edu.id}
-                                        className="avoid-page-break"
+                                        className="avoid-page-break pb-2"
                                     >
                                         <div className="flex justify-between items-start">
                                             <div className="flex-grow">
@@ -200,16 +200,16 @@ const ClassicTemplate = memo(({ data }) => {
 
                     {/* Certifications Section */}
                     {hasContent(certifications) && (
-                        <section className="mb-5">
+                        <section className="mb-6">
                             <h2 className="text-lg font-bold text-gray-900 mb-2 pb-1 border-b-2 border-gray-800 uppercase tracking-wide">
                                 {certifications.sectionTitle ||
                                     "Certifications"}
                             </h2>
-                            <div className="space-y-3">
+                            <div className="space-y-4">
                                 {certifications.items.map((cert) => (
                                     <div
                                         key={cert.id}
-                                        className="flex items-start gap-2 avoid-page-break"
+                                        className="flex items-start gap-2 avoid-page-break pb-2"
                                     >
                                         <span className="text-gray-800 font-medium mt-1">
                                             •
@@ -247,16 +247,16 @@ const ClassicTemplate = memo(({ data }) => {
 
                     {/* Activities Section */}
                     {hasContent(activities) && (
-                        <section className="mb-5">
+                        <section className="mb-6">
                             <h2 className="text-lg font-bold text-gray-900 mb-2 pb-1 border-b-2 border-gray-800 uppercase tracking-wide">
                                 {activities.sectionTitle ||
                                     "Activities & Achievements"}
                             </h2>
-                            <div className="space-y-3">
+                            <div className="space-y-4">
                                 {activities.items.map((activity) => (
                                     <div
                                         key={activity.id}
-                                        className="avoid-page-break"
+                                        className="avoid-page-break pb-3"
                                     >
                                         <div className="flex justify-between items-start mb-1">
                                             <h3 className="text-base font-bold text-gray-900 flex-grow">
@@ -282,7 +282,7 @@ const ClassicTemplate = memo(({ data }) => {
 
                     {/* Language Competencies Section */}
                     {hasContent(languageCompetencies) && (
-                        <section className="mb-5">
+                        <section className="mb-6 avoid-page-break">
                             <h2 className="text-lg font-bold text-gray-900 mb-2 pb-1 border-b-2 border-gray-800 uppercase tracking-wide">
                                 {languageCompetencies.sectionTitle ||
                                     "Languages"}
@@ -316,15 +316,31 @@ const ClassicTemplate = memo(({ data }) => {
 
             {/* Print Styles */}
             <style>{`
+                .avoid-page-break {
+                    page-break-inside: avoid !important;
+                    break-inside: avoid !important;
+                }
+
                 @media print {
                     .classic-template {
                         box-shadow: none !important;
                         border-radius: 0 !important;
                     }
 
+                    .avoid-page-break {
+                        page-break-inside: avoid !important;
+                        break-inside: avoid !important;
+                    }
+
                     @page {
                         margin: 0.5in;
                         size: A4;
+                    }
+                }
+
+                @media screen {
+                    .avoid-page-break {
+                        margin-bottom: 0.5rem;
                     }
                 }
             `}</style>

@@ -31,6 +31,7 @@ const CVPreview = memo(
         const [pageCount, setPageCount] = useState(1);
         const [currentPage, setCurrentPage] = useState(1);
         const previewRef = useRef(null);
+        const scrollContainerRef = useRef(null);
 
         // Calculate page count based on content height
         useEffect(() => {
@@ -48,6 +49,22 @@ const CVPreview = memo(
                 }
             }
         }, [data, template, zoom]);
+
+        // Scroll to current page when currentPage changes
+        useEffect(() => {
+            if (scrollContainerRef.current && pageCount > 1) {
+                const a4HeightMm = 297;
+                const scrollPosition = (currentPage - 1) * a4HeightMm;
+
+                // Convert mm to pixels for scrolling (1mm ≈ 3.7795px at 96 DPI)
+                const scrollPositionPx = scrollPosition * 3.7795 * (zoom / 100);
+
+                scrollContainerRef.current.scrollTo({
+                    top: scrollPositionPx,
+                    behavior: "smooth",
+                });
+            }
+        }, [currentPage, pageCount, zoom]);
 
         const handleZoomIn = () => {
             setZoom((prev) => Math.min(prev + 10, 150));
@@ -378,7 +395,11 @@ const CVPreview = memo(
                 </div>
 
                 {/* Template Preview Area with A4 Page Visualization */}
-                <div className="bg-gray-100 rounded-lg p-6 relative">
+                <div
+                    ref={scrollContainerRef}
+                    className="bg-gray-100 rounded-lg p-6 relative overflow-y-auto"
+                    style={{ maxHeight: "calc(100vh - 300px)" }}
+                >
                     {/* A4 Page Container */}
                     <div
                         ref={previewRef}
