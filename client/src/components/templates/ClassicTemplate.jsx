@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 import { FormattedDescription } from "../common";
 
 /**
- * Classic CV Template - Traditional single-column layout with page-by-page rendering
+ * Classic CV Template - Traditional single-column layout with intelligent page breaks
  * @param {Object} props - Component props
  * @param {Object} props.data - Complete CV data object
  * @param {number} props.currentPage - Current page number to display
@@ -32,18 +32,68 @@ const ClassicTemplate = memo(({ data, currentPage = 1, onPageCountChange }) => {
         return false;
     };
 
-    // Calculate total pages based on content height
+    // Intelligent page break calculation
     useEffect(() => {
         if (contentRef.current) {
-            const contentHeight = contentRef.current.scrollHeight;
-            // A4 height in pixels: 297mm ≈ 1122px at 96 DPI
-            // Use 1050px effective height to leave ~70px padding at bottom of each page
-            // This prevents content from being cut off at page boundaries
-            const pageHeightPx = 1050;
-            const pages = Math.ceil(contentHeight / pageHeightPx);
+            const A4_HEIGHT_PX = 1122; // 297mm at 96 DPI
+            const MIN_ITEM_SPACE = 100; // Minimum space needed at bottom to keep item on page
+
+            // Get all breakable items
+            const items = contentRef.current.querySelectorAll(
+                ".page-section, .page-item, .page-section-header",
+            );
+
+            let currentPageBottom = A4_HEIGHT_PX;
+            let pageCount = 1;
+
+            items.forEach((item) => {
+                // Remove any previous page break class
+                item.classList.remove("force-page-break");
+                item.style.marginTop = "";
+
+                const itemTop = item.offsetTop;
+                const itemHeight = item.offsetHeight;
+                const itemBottom = itemTop + itemHeight;
+
+                // Check if item would cross page boundary
+                if (
+                    itemTop < currentPageBottom &&
+                    itemBottom > currentPageBottom
+                ) {
+                    // Item would be cut - check if we have space for it
+                    const spaceLeft = currentPageBottom - itemTop;
+
+                    if (
+                        spaceLeft < MIN_ITEM_SPACE ||
+                        itemHeight > MIN_ITEM_SPACE
+                    ) {
+                        // Not enough space or item is too big - push to next page
+                        const pushDistance = currentPageBottom - itemTop;
+                        item.style.marginTop = `${pushDistance}px`;
+                        item.classList.add("force-page-break");
+
+                        // Update page boundary
+                        pageCount++;
+                        currentPageBottom =
+                            itemTop + pushDistance + A4_HEIGHT_PX;
+                    }
+                } else if (itemTop >= currentPageBottom) {
+                    // Item starts on or after current page boundary
+                    const pagesSkipped = Math.floor(itemTop / A4_HEIGHT_PX);
+                    if (pagesSkipped > pageCount - 1) {
+                        pageCount = pagesSkipped + 1;
+                        currentPageBottom = pageCount * A4_HEIGHT_PX;
+                    }
+                }
+            });
+
+            // Final page count based on total height
+            const totalHeight = contentRef.current.scrollHeight;
+            const calculatedPages = Math.ceil(totalHeight / A4_HEIGHT_PX);
+            const finalPageCount = Math.max(pageCount, calculatedPages);
 
             if (onPageCountChange) {
-                onPageCountChange(Math.max(1, pages));
+                onPageCountChange(finalPageCount);
             }
         }
     }, [data, onPageCountChange]);
@@ -358,6 +408,11 @@ const ClassicTemplate = memo(({ data, currentPage = 1, onPageCountChange }) => {
                     will-change: transform;
                 }
 
+                .force-page-break {
+                    page-break-before: always !important;
+                    break-before: page !important;
+                }
+
                 .page-section,
                 .page-item,
                 .page-section-header {
@@ -378,6 +433,12 @@ const ClassicTemplate = memo(({ data, currentPage = 1, onPageCountChange }) => {
 
                     .sliding-content {
                         transform: none !important;
+                    }
+
+                    .force-page-break {
+                        margin-top: 0 !important;
+                        page-break-before: always !important;
+                        break-before: page !important;
                     }
 
                     .page-section,
