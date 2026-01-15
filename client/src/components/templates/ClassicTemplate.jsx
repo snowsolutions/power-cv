@@ -39,10 +39,10 @@ const ClassicTemplate = memo(({ data, currentPage = 1, onPageCountChange }) => {
             const MIN_SECTION_SPACE = 60; // Space needed for section headers
             const MIN_ITEM_SPACE = 30; // Space needed for regular items
 
-            // Get all breakable items - prioritize h2 headers first, then other items
+            // Get all breakable items - h2 section headers, h3 job titles, and content items
             const allItems = Array.from(
                 contentRef.current.querySelectorAll(
-                    "h2.section-title, .page-item",
+                    "h2.section-title, .page-item, .job-title",
                 ),
             );
 
@@ -62,11 +62,16 @@ const ClassicTemplate = memo(({ data, currentPage = 1, onPageCountChange }) => {
                 const itemHeight = item.offsetHeight;
                 const itemBottom = itemTop + itemHeight;
 
-                // Determine if this is a section header/title
+                // Determine if this is a section header/title or job title
                 const isSectionHeader = item.tagName === "H2";
+                const isJobTitle =
+                    item.tagName === "H3" ||
+                    item.classList.contains("job-title");
                 const minSpace = isSectionHeader
                     ? MIN_SECTION_SPACE
-                    : MIN_ITEM_SPACE;
+                    : isJobTitle
+                      ? 50 // Job titles need more space
+                      : MIN_ITEM_SPACE;
 
                 const itemText =
                     item.textContent?.substring(0, 50) || item.tagName;
@@ -79,10 +84,11 @@ const ClassicTemplate = memo(({ data, currentPage = 1, onPageCountChange }) => {
                     // Item would be cut - check if we have space for it
                     const spaceLeft = currentPageBottom - itemTop;
 
-                    // For section headers, always push to next page if they would be cut
+                    // For section headers and job titles, always push to next page if they would be cut
                     // For items, push if less than minimum space or item is tall
                     if (
                         isSectionHeader ||
+                        isJobTitle ||
                         spaceLeft < minSpace ||
                         itemHeight > minSpace * 2
                     ) {
@@ -92,7 +98,7 @@ const ClassicTemplate = memo(({ data, currentPage = 1, onPageCountChange }) => {
                         item.classList.add("force-page-break");
 
                         console.log(
-                            `[PageBreak] Item ${index}: "${itemText}" | isHeader: ${isSectionHeader} | spaceLeft: ${spaceLeft.toFixed(0)}px | pushDistance: ${pushDistance.toFixed(0)}px | reason: ${isSectionHeader ? "Section Header" : spaceLeft < minSpace ? "Insufficient Space" : "Item Too Tall"}`,
+                            `[PageBreak] Item ${index}: "${itemText}" | isHeader: ${isSectionHeader} | isJobTitle: ${isJobTitle} | spaceLeft: ${spaceLeft.toFixed(0)}px | pushDistance: ${pushDistance.toFixed(0)}px | reason: ${isSectionHeader ? "Section Header" : isJobTitle ? "Job Title" : spaceLeft < minSpace ? "Insufficient Space" : "Item Too Tall"}`,
                         );
 
                         // Update page boundary
@@ -244,7 +250,7 @@ const ClassicTemplate = memo(({ data, currentPage = 1, onPageCountChange }) => {
                                         >
                                             <div className="flex justify-between items-start mb-1">
                                                 <div className="flex-grow">
-                                                    <h3 className="text-base font-bold text-gray-900">
+                                                    <h3 className="text-base font-bold text-gray-900 job-title">
                                                         {work.position}
                                                     </h3>
                                                     <p className="text-md font-semibold text-gray-700 italic">
