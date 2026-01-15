@@ -1,14 +1,16 @@
-import { memo } from "react";
+import { memo, useEffect, useRef } from "react";
 import PropTypes from "prop-types";
 import { FormattedDescription } from "../common";
 
 /**
- * Classic CV Template - Traditional single-column layout
+ * Classic CV Template - Traditional single-column layout with page-by-page rendering
  * @param {Object} props - Component props
  * @param {Object} props.data - Complete CV data object
+ * @param {number} props.currentPage - Current page number to display
+ * @param {Function} props.onPageCountChange - Callback when total page count changes
  * @returns {JSX.Element} Classic template component
  */
-const ClassicTemplate = memo(({ data }) => {
+const ClassicTemplate = memo(({ data, currentPage = 1, onPageCountChange }) => {
     const {
         personalInfo,
         introduction,
@@ -20,6 +22,8 @@ const ClassicTemplate = memo(({ data }) => {
         languageCompetencies,
     } = data;
 
+    const contentRef = useRef(null);
+
     // Helper function to check if a section has content
     const hasContent = (section) => {
         if (!section) return false;
@@ -28,306 +32,355 @@ const ClassicTemplate = memo(({ data }) => {
         return false;
     };
 
+    // Calculate total pages based on content height
+    useEffect(() => {
+        if (contentRef.current) {
+            const contentHeight = contentRef.current.scrollHeight;
+            // A4 height in pixels: 297mm ≈ 1122px at 96 DPI
+            const pageHeightPx = 1122;
+            const pages = Math.ceil(contentHeight / pageHeightPx);
+
+            if (onPageCountChange) {
+                onPageCountChange(Math.max(1, pages));
+            }
+        }
+    }, [data, onPageCountChange]);
+
     return (
-        <div className="classic-template bg-white shadow-lg rounded-lg overflow-hidden print:shadow-none print:rounded-none max-w-[210mm] mx-auto print:max-w-full">
-            {/* A4 Size Container - 210mm x 297mm */}
-            <div className="min-h-[297mm] print:min-h-0 p-0">
-                {/* Header Section - Centered Traditional Style */}
-                <div className="border-b-4 border-gray-800 px-8 py-6 print:px-12 print:py-8 text-center avoid-page-break">
-                    <h1 className="text-3xl font-bold text-gray-900 mb-3 uppercase tracking-wide">
-                        {personalInfo.name || "Your Name"}
-                    </h1>
+        <div className="classic-template-container relative w-[210mm] mx-auto">
+            {/* Page viewport - shows only one page at a time */}
+            <div className="page-viewport h-[297mm] overflow-hidden relative bg-white shadow-lg rounded-lg print:shadow-none print:rounded-none">
+                {/* Sliding content wrapper */}
+                <div
+                    ref={contentRef}
+                    className="sliding-content transition-transform duration-500 ease-in-out"
+                    style={{
+                        transform: `translateY(-${(currentPage - 1) * 297}mm)`,
+                    }}
+                >
+                    {/* Header Section - Centered Traditional Style */}
+                    <div className="border-b-4 border-gray-800 px-8 py-6 print:px-12 print:py-8 text-center page-section-header">
+                        <h1 className="text-3xl font-bold text-gray-900 mb-3 uppercase tracking-wide">
+                            {personalInfo.name || "Your Name"}
+                        </h1>
 
-                    {/* Contact Information - Horizontal Layout */}
-                    <div className="flex flex-wrap items-center justify-center gap-4 text-sm text-gray-700">
-                        {personalInfo.email && (
-                            <div className="flex items-center gap-1">
-                                <span className="font-semibold">Email:</span>
-                                <span>{personalInfo.email}</span>
-                            </div>
-                        )}
-                        {personalInfo.phone && (
-                            <>
-                                {personalInfo.email && <span>|</span>}
+                        {/* Contact Information - Horizontal Layout */}
+                        <div className="flex flex-wrap items-center justify-center gap-4 text-sm text-gray-700">
+                            {personalInfo.email && (
                                 <div className="flex items-center gap-1">
                                     <span className="font-semibold">
-                                        Phone:
+                                        Email:
                                     </span>
-                                    <span>{personalInfo.phone}</span>
+                                    <span>{personalInfo.email}</span>
                                 </div>
-                            </>
-                        )}
-                        {personalInfo.address && (
-                            <>
-                                {(personalInfo.email || personalInfo.phone) && (
-                                    <span>|</span>
-                                )}
-                                <div className="flex items-center gap-1">
-                                    <span className="font-semibold">
-                                        Address:
-                                    </span>
-                                    <span>{personalInfo.address}</span>
-                                </div>
-                            </>
-                        )}
+                            )}
+                            {personalInfo.phone && (
+                                <>
+                                    {personalInfo.email && <span>|</span>}
+                                    <div className="flex items-center gap-1">
+                                        <span className="font-semibold">
+                                            Phone:
+                                        </span>
+                                        <span>{personalInfo.phone}</span>
+                                    </div>
+                                </>
+                            )}
+                            {personalInfo.address && (
+                                <>
+                                    {(personalInfo.email ||
+                                        personalInfo.phone) && <span>|</span>}
+                                    <div className="flex items-center gap-1">
+                                        <span className="font-semibold">
+                                            Address:
+                                        </span>
+                                        <span>{personalInfo.address}</span>
+                                    </div>
+                                </>
+                            )}
+                        </div>
                     </div>
-                </div>
 
-                {/* Main Content - Single Column */}
-                <div className="px-8 py-6 print:px-12 print:py-8 space-y-6">
-                    {/* Introduction Section */}
-                    {hasContent(introduction) && (
-                        <section className="mb-6 avoid-page-break">
-                            <h2 className="text-lg font-bold text-gray-900 mb-2 pb-1 border-b-2 border-gray-800 uppercase tracking-wide">
-                                {introduction.sectionTitle ||
-                                    "Professional Summary"}
-                            </h2>
-                            <div
-                                className="prose prose-sm max-w-none text-gray-700 leading-relaxed text-justify"
-                                dangerouslySetInnerHTML={{
-                                    __html: introduction.content,
-                                }}
-                            />
-                        </section>
-                    )}
+                    {/* Main Content - Single Column */}
+                    <div className="px-8 py-6 print:px-12 print:py-8 space-y-6">
+                        {/* Introduction Section */}
+                        {hasContent(introduction) && (
+                            <section className="mb-6 page-section">
+                                <h2 className="text-lg font-bold text-gray-900 mb-2 pb-1 border-b-2 border-gray-800 uppercase tracking-wide">
+                                    {introduction.sectionTitle ||
+                                        "Professional Summary"}
+                                </h2>
+                                <div
+                                    className="prose prose-sm max-w-none text-gray-700 leading-relaxed text-justify"
+                                    dangerouslySetInnerHTML={{
+                                        __html: introduction.content,
+                                    }}
+                                />
+                            </section>
+                        )}
 
-                    {/* Professional Skills Section */}
-                    {hasContent(professionalSkills) && (
-                        <section className="mb-6 avoid-page-break">
-                            <h2 className="text-lg font-bold text-gray-900 mb-2 pb-1 border-b-2 border-gray-800 uppercase tracking-wide">
-                                {professionalSkills.sectionTitle ||
-                                    "Professional Skills"}
-                            </h2>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                {professionalSkills.items.map((skill) => (
-                                    <div
-                                        key={skill.id}
-                                        className="flex items-start gap-2"
-                                    >
-                                        <span className="text-gray-800 font-medium">
-                                            •
-                                        </span>
-                                        <div className="flex-grow">
-                                            <span className="text-gray-800 font-semibold">
-                                                {skill.skillName}
+                        {/* Professional Skills Section */}
+                        {hasContent(professionalSkills) && (
+                            <section className="mb-6 page-section">
+                                <h2 className="text-lg font-bold text-gray-900 mb-2 pb-1 border-b-2 border-gray-800 uppercase tracking-wide">
+                                    {professionalSkills.sectionTitle ||
+                                        "Professional Skills"}
+                                </h2>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                    {professionalSkills.items.map((skill) => (
+                                        <div
+                                            key={skill.id}
+                                            className="flex items-start gap-2"
+                                        >
+                                            <span className="text-gray-800 font-medium">
+                                                •
                                             </span>
-                                            {skill.proficiency && (
-                                                <span className="text-gray-600 text-sm ml-2">
-                                                    ({skill.proficiency})
+                                            <div className="flex-grow">
+                                                <span className="text-gray-800 font-semibold">
+                                                    {skill.skillName}
                                                 </span>
-                                            )}
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        </section>
-                    )}
-
-                    {/* Work History Section */}
-                    {hasContent(workHistory) && (
-                        <section className="mb-6">
-                            <h2 className="text-lg font-bold text-gray-900 mb-2 pb-1 border-b-2 border-gray-800 uppercase tracking-wide">
-                                {workHistory.sectionTitle ||
-                                    "Professional Experience"}
-                            </h2>
-                            <div className="space-y-5">
-                                {workHistory.items.map((work) => (
-                                    <div
-                                        key={work.id}
-                                        className="avoid-page-break pb-3"
-                                    >
-                                        <div className="flex justify-between items-start mb-1">
-                                            <div className="flex-grow">
-                                                <h3 className="text-base font-bold text-gray-900">
-                                                    {work.position}
-                                                </h3>
-                                                <p className="text-md font-semibold text-gray-700 italic">
-                                                    {work.companyName}
-                                                </p>
-                                            </div>
-                                            <div className="text-sm text-gray-600 text-right ml-4 flex-shrink-0">
-                                                <p>
-                                                    {work.dateFrom} -{" "}
-                                                    {work.dateTo || "Present"}
-                                                </p>
-                                            </div>
-                                        </div>
-                                        {work.description && (
-                                            <FormattedDescription
-                                                text={work.description}
-                                                className="text-sm text-gray-700 leading-relaxed text-justify mt-2"
-                                            />
-                                        )}
-                                    </div>
-                                ))}
-                            </div>
-                        </section>
-                    )}
-
-                    {/* Education Section */}
-                    {hasContent(educations) && (
-                        <section className="mb-6">
-                            <h2 className="text-lg font-bold text-gray-900 mb-2 pb-1 border-b-2 border-gray-800 uppercase tracking-wide">
-                                {educations.sectionTitle || "Education"}
-                            </h2>
-                            <div className="space-y-4">
-                                {educations.items.map((edu) => (
-                                    <div
-                                        key={edu.id}
-                                        className="avoid-page-break pb-2"
-                                    >
-                                        <div className="flex justify-between items-start">
-                                            <div className="flex-grow">
-                                                <h3 className="text-base font-bold text-gray-900">
-                                                    {edu.profession}
-                                                </h3>
-                                                <p className="text-md font-semibold text-gray-700 italic">
-                                                    {edu.schoolName}
-                                                </p>
-                                            </div>
-                                            <div className="text-sm text-gray-600 text-right ml-4 flex-shrink-0">
-                                                <p>
-                                                    {edu.studyFrom} -{" "}
-                                                    {edu.studyTo || "Present"}
-                                                </p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        </section>
-                    )}
-
-                    {/* Certifications Section */}
-                    {hasContent(certifications) && (
-                        <section className="mb-6">
-                            <h2 className="text-lg font-bold text-gray-900 mb-2 pb-1 border-b-2 border-gray-800 uppercase tracking-wide">
-                                {certifications.sectionTitle ||
-                                    "Certifications"}
-                            </h2>
-                            <div className="space-y-4">
-                                {certifications.items.map((cert) => (
-                                    <div
-                                        key={cert.id}
-                                        className="flex items-start gap-2 avoid-page-break pb-2"
-                                    >
-                                        <span className="text-gray-800 font-medium mt-1">
-                                            •
-                                        </span>
-                                        <div className="flex-grow">
-                                            <h3 className="text-base font-bold text-gray-900">
-                                                {cert.certName}
-                                            </h3>
-                                            <p className="text-sm text-gray-600">
-                                                {cert.organization}
-                                                {cert.certExpiration && (
-                                                    <span className="text-gray-600">
-                                                        {" "}
-                                                        • Expires:{" "}
-                                                        {cert.certExpiration}
+                                                {skill.proficiency && (
+                                                    <span className="text-gray-600 text-sm ml-2">
+                                                        ({skill.proficiency})
                                                     </span>
                                                 )}
-                                            </p>
-                                            {cert.certLink && (
-                                                <a
-                                                    href={cert.certLink}
-                                                    target="_blank"
-                                                    rel="noopener noreferrer"
-                                                    className="text-sm text-blue-700 hover:underline"
-                                                >
-                                                    {cert.certLink}
-                                                </a>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </section>
+                        )}
+
+                        {/* Work History Section */}
+                        {hasContent(workHistory) && (
+                            <section className="mb-6 page-section">
+                                <h2 className="text-lg font-bold text-gray-900 mb-2 pb-1 border-b-2 border-gray-800 uppercase tracking-wide">
+                                    {workHistory.sectionTitle ||
+                                        "Professional Experience"}
+                                </h2>
+                                <div className="space-y-5">
+                                    {workHistory.items.map((work) => (
+                                        <div
+                                            key={work.id}
+                                            className="page-item pb-3"
+                                        >
+                                            <div className="flex justify-between items-start mb-1">
+                                                <div className="flex-grow">
+                                                    <h3 className="text-base font-bold text-gray-900">
+                                                        {work.position}
+                                                    </h3>
+                                                    <p className="text-md font-semibold text-gray-700 italic">
+                                                        {work.companyName}
+                                                    </p>
+                                                </div>
+                                                <div className="text-sm text-gray-600 text-right ml-4 flex-shrink-0">
+                                                    <p>
+                                                        {work.dateFrom} -{" "}
+                                                        {work.dateTo ||
+                                                            "Present"}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            {work.description && (
+                                                <FormattedDescription
+                                                    text={work.description}
+                                                    className="text-sm text-gray-700 leading-relaxed text-justify mt-2"
+                                                />
                                             )}
                                         </div>
-                                    </div>
-                                ))}
-                            </div>
-                        </section>
-                    )}
+                                    ))}
+                                </div>
+                            </section>
+                        )}
 
-                    {/* Activities Section */}
-                    {hasContent(activities) && (
-                        <section className="mb-6">
-                            <h2 className="text-lg font-bold text-gray-900 mb-2 pb-1 border-b-2 border-gray-800 uppercase tracking-wide">
-                                {activities.sectionTitle ||
-                                    "Activities & Achievements"}
-                            </h2>
-                            <div className="space-y-4">
-                                {activities.items.map((activity) => (
-                                    <div
-                                        key={activity.id}
-                                        className="avoid-page-break pb-3"
-                                    >
-                                        <div className="flex justify-between items-start mb-1">
-                                            <h3 className="text-base font-bold text-gray-900 flex-grow">
-                                                {activity.activityName}
-                                            </h3>
-                                            {activity.activityDate && (
-                                                <span className="text-sm text-gray-600 ml-4 flex-shrink-0">
-                                                    {activity.activityDate}
-                                                </span>
-                                            )}
+                        {/* Education Section */}
+                        {hasContent(educations) && (
+                            <section className="mb-6 page-section">
+                                <h2 className="text-lg font-bold text-gray-900 mb-2 pb-1 border-b-2 border-gray-800 uppercase tracking-wide">
+                                    {educations.sectionTitle || "Education"}
+                                </h2>
+                                <div className="space-y-4">
+                                    {educations.items.map((edu) => (
+                                        <div
+                                            key={edu.id}
+                                            className="page-item pb-2"
+                                        >
+                                            <div className="flex justify-between items-start">
+                                                <div className="flex-grow">
+                                                    <h3 className="text-base font-bold text-gray-900">
+                                                        {edu.profession}
+                                                    </h3>
+                                                    <p className="text-md font-semibold text-gray-700 italic">
+                                                        {edu.schoolName}
+                                                    </p>
+                                                </div>
+                                                <div className="text-sm text-gray-600 text-right ml-4 flex-shrink-0">
+                                                    <p>
+                                                        {edu.studyFrom} -{" "}
+                                                        {edu.studyTo ||
+                                                            "Present"}
+                                                    </p>
+                                                </div>
+                                            </div>
                                         </div>
-                                        {activity.description && (
-                                            <FormattedDescription
-                                                text={activity.description}
-                                                className="text-sm text-gray-700 leading-relaxed text-justify mt-2"
-                                            />
-                                        )}
-                                    </div>
-                                ))}
-                            </div>
-                        </section>
-                    )}
+                                    ))}
+                                </div>
+                            </section>
+                        )}
 
-                    {/* Language Competencies Section */}
-                    {hasContent(languageCompetencies) && (
-                        <section className="mb-6 avoid-page-break">
-                            <h2 className="text-lg font-bold text-gray-900 mb-2 pb-1 border-b-2 border-gray-800 uppercase tracking-wide">
-                                {languageCompetencies.sectionTitle ||
-                                    "Languages"}
-                            </h2>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                {languageCompetencies.items.map((lang) => (
-                                    <div
-                                        key={lang.id}
-                                        className="flex items-start gap-2"
-                                    >
-                                        <span className="text-gray-800 font-medium">
-                                            •
-                                        </span>
-                                        <div className="flex-grow">
-                                            <span className="text-gray-800 font-semibold">
-                                                {lang.languageName}
+                        {/* Certifications Section */}
+                        {hasContent(certifications) && (
+                            <section className="mb-6 page-section">
+                                <h2 className="text-lg font-bold text-gray-900 mb-2 pb-1 border-b-2 border-gray-800 uppercase tracking-wide">
+                                    {certifications.sectionTitle ||
+                                        "Certifications"}
+                                </h2>
+                                <div className="space-y-4">
+                                    {certifications.items.map((cert) => (
+                                        <div
+                                            key={cert.id}
+                                            className="flex items-start gap-2 page-item pb-2"
+                                        >
+                                            <span className="text-gray-800 font-medium mt-1">
+                                                •
                                             </span>
-                                            {lang.proficiency && (
-                                                <span className="text-gray-600 text-sm ml-2">
-                                                    ({lang.proficiency})
-                                                </span>
+                                            <div className="flex-grow">
+                                                <h3 className="text-base font-bold text-gray-900">
+                                                    {cert.certName}
+                                                </h3>
+                                                <p className="text-sm text-gray-600">
+                                                    {cert.organization}
+                                                    {cert.certExpiration && (
+                                                        <span className="text-gray-600">
+                                                            {" "}
+                                                            • Expires:{" "}
+                                                            {
+                                                                cert.certExpiration
+                                                            }
+                                                        </span>
+                                                    )}
+                                                </p>
+                                                {cert.certLink && (
+                                                    <a
+                                                        href={cert.certLink}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        className="text-sm text-blue-700 hover:underline"
+                                                    >
+                                                        {cert.certLink}
+                                                    </a>
+                                                )}
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </section>
+                        )}
+
+                        {/* Activities Section */}
+                        {hasContent(activities) && (
+                            <section className="mb-6 page-section">
+                                <h2 className="text-lg font-bold text-gray-900 mb-2 pb-1 border-b-2 border-gray-800 uppercase tracking-wide">
+                                    {activities.sectionTitle ||
+                                        "Activities & Achievements"}
+                                </h2>
+                                <div className="space-y-4">
+                                    {activities.items.map((activity) => (
+                                        <div
+                                            key={activity.id}
+                                            className="page-item pb-3"
+                                        >
+                                            <div className="flex justify-between items-start mb-1">
+                                                <h3 className="text-base font-bold text-gray-900 flex-grow">
+                                                    {activity.activityName}
+                                                </h3>
+                                                {activity.activityDate && (
+                                                    <span className="text-sm text-gray-600 ml-4 flex-shrink-0">
+                                                        {activity.activityDate}
+                                                    </span>
+                                                )}
+                                            </div>
+                                            {activity.description && (
+                                                <FormattedDescription
+                                                    text={activity.description}
+                                                    className="text-sm text-gray-700 leading-relaxed text-justify mt-2"
+                                                />
                                             )}
                                         </div>
-                                    </div>
-                                ))}
-                            </div>
-                        </section>
-                    )}
+                                    ))}
+                                </div>
+                            </section>
+                        )}
+
+                        {/* Language Competencies Section */}
+                        {hasContent(languageCompetencies) && (
+                            <section className="mb-6 page-section">
+                                <h2 className="text-lg font-bold text-gray-900 mb-2 pb-1 border-b-2 border-gray-800 uppercase tracking-wide">
+                                    {languageCompetencies.sectionTitle ||
+                                        "Languages"}
+                                </h2>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                    {languageCompetencies.items.map((lang) => (
+                                        <div
+                                            key={lang.id}
+                                            className="flex items-start gap-2"
+                                        >
+                                            <span className="text-gray-800 font-medium">
+                                                •
+                                            </span>
+                                            <div className="flex-grow">
+                                                <span className="text-gray-800 font-semibold">
+                                                    {lang.languageName}
+                                                </span>
+                                                {lang.proficiency && (
+                                                    <span className="text-gray-600 text-sm ml-2">
+                                                        ({lang.proficiency})
+                                                    </span>
+                                                )}
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </section>
+                        )}
+                    </div>
                 </div>
             </div>
 
             {/* Print Styles */}
             <style>{`
-                .avoid-page-break {
+                .page-viewport {
+                    position: relative;
+                }
+
+                .sliding-content {
+                    will-change: transform;
+                }
+
+                .page-section,
+                .page-item,
+                .page-section-header {
                     page-break-inside: avoid !important;
                     break-inside: avoid !important;
                 }
 
                 @media print {
-                    .classic-template {
+                    .classic-template-container {
                         box-shadow: none !important;
                         border-radius: 0 !important;
                     }
 
-                    .avoid-page-break {
+                    .page-viewport {
+                        height: auto !important;
+                        overflow: visible !important;
+                    }
+
+                    .sliding-content {
+                        transform: none !important;
+                    }
+
+                    .page-section,
+                    .page-item,
+                    .page-section-header {
                         page-break-inside: avoid !important;
                         break-inside: avoid !important;
                     }
@@ -339,14 +392,16 @@ const ClassicTemplate = memo(({ data }) => {
                 }
 
                 @media screen {
-                    .avoid-page-break {
-                        margin-bottom: 0.5rem;
+                    .page-section,
+                    .page-item {
+                        margin-bottom: 1rem;
                     }
                 }
             `}</style>
         </div>
     );
 });
+ClassicTemplate.displayName = "ClassicTemplate";
 
 ClassicTemplate.propTypes = {
     data: PropTypes.shape({
@@ -359,8 +414,8 @@ ClassicTemplate.propTypes = {
         professionalSkills: PropTypes.object,
         languageCompetencies: PropTypes.object,
     }).isRequired,
+    currentPage: PropTypes.number,
+    onPageCountChange: PropTypes.func,
 };
-
-ClassicTemplate.displayName = "ClassicTemplate";
 
 export default ClassicTemplate;

@@ -1,4 +1,4 @@
-import { useState, memo, useRef, useEffect } from "react";
+import { useState, memo, useRef } from "react";
 import PropTypes from "prop-types";
 import {
     ModernTemplate,
@@ -31,40 +31,6 @@ const CVPreview = memo(
         const [pageCount, setPageCount] = useState(1);
         const [currentPage, setCurrentPage] = useState(1);
         const previewRef = useRef(null);
-        const scrollContainerRef = useRef(null);
-
-        // Calculate page count based on content height
-        useEffect(() => {
-            if (previewRef.current) {
-                const templateElement =
-                    previewRef.current.querySelector("[data-template]");
-                if (templateElement) {
-                    // A4 height in pixels (assuming 96 DPI)
-                    const a4HeightPx = 1122; // ~297mm at 96 DPI
-                    const contentHeight = templateElement.scrollHeight;
-                    const calculatedPages = Math.ceil(
-                        contentHeight / a4HeightPx,
-                    );
-                    setPageCount(Math.max(1, calculatedPages));
-                }
-            }
-        }, [data, template, zoom]);
-
-        // Scroll to current page when currentPage changes
-        useEffect(() => {
-            if (scrollContainerRef.current && pageCount > 1) {
-                const a4HeightMm = 297;
-                const scrollPosition = (currentPage - 1) * a4HeightMm;
-
-                // Convert mm to pixels for scrolling (1mm ≈ 3.7795px at 96 DPI)
-                const scrollPositionPx = scrollPosition * 3.7795 * (zoom / 100);
-
-                scrollContainerRef.current.scrollTo({
-                    top: scrollPositionPx,
-                    behavior: "smooth",
-                });
-            }
-        }, [currentPage, pageCount, zoom]);
 
         const handleZoomIn = () => {
             setZoom((prev) => Math.min(prev + 10, 150));
@@ -114,13 +80,28 @@ const CVPreview = memo(
             }
         };
 
+        // Handle page count updates from template
+        const handlePageCountChange = (count) => {
+            setPageCount(count);
+            // Reset to page 1 if current page is beyond new page count
+            if (currentPage > count) {
+                setCurrentPage(1);
+            }
+        };
+
         // Template mapping
         const getTemplate = () => {
             switch (template.toLowerCase()) {
                 case "modern":
                     return <ModernTemplate data={data} />;
                 case "classic":
-                    return <ClassicTemplate data={data} />;
+                    return (
+                        <ClassicTemplate
+                            data={data}
+                            currentPage={currentPage}
+                            onPageCountChange={handlePageCountChange}
+                        />
+                    );
                 case "creative":
                     return <CreativeTemplate data={data} />;
                 case "minimal":
@@ -395,44 +376,17 @@ const CVPreview = memo(
                 </div>
 
                 {/* Template Preview Area with A4 Page Visualization */}
-                <div
-                    ref={scrollContainerRef}
-                    className="bg-gray-100 rounded-lg p-6 relative overflow-y-auto"
-                    style={{ maxHeight: "calc(100vh - 300px)" }}
-                >
-                    {/* A4 Page Container */}
+                <div className="bg-gray-100 rounded-lg p-6 relative">
+                    {/* Template Container with Zoom */}
                     <div
                         ref={previewRef}
-                        className="bg-white mx-auto shadow-2xl overflow-visible relative"
+                        className="mx-auto"
                         style={{
-                            width: "210mm",
-                            minHeight: "297mm",
                             transform: `scale(${zoom / 100})`,
                             transformOrigin: "top center",
                             transition: "transform 0.2s ease-in-out",
                         }}
                     >
-                        {/* Page Break Indicators */}
-                        {pageCount > 1 &&
-                            Array.from({ length: pageCount - 1 }).map(
-                                (_, index) => (
-                                    <div
-                                        key={index}
-                                        className="absolute left-0 right-0 pointer-events-none z-10"
-                                        style={{
-                                            top: `${(index + 1) * 297}mm`,
-                                            height: "2px",
-                                        }}
-                                    >
-                                        <div className="h-full bg-blue-400 opacity-50 relative">
-                                            <span className="absolute right-2 -top-3 bg-blue-500 text-white text-xs px-2 py-1 rounded">
-                                                Page Break
-                                            </span>
-                                        </div>
-                                    </div>
-                                ),
-                            )}
-
                         <div data-template>{getTemplate()}</div>
                     </div>
 
