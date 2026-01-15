@@ -1,0 +1,258 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom base styles */
+@layer base {
+    body {
+        @apply font-sans antialiased bg-gray-50 text-gray-900;
+    }
+
+    h1 {
+        @apply text-4xl font-bold text-gray-900;
+    }
+
+    h2 {
+        @apply text-3xl font-semibold text-gray-800;
+    }
+
+    h3 {
+        @apply text-2xl font-semibold text-gray-800;
+    }
+
+    h4 {
+        @apply text-xl font-semibold text-gray-700;
+    }
+
+    h5 {
+        @apply text-lg font-semibold text-gray-700;
+    }
+
+    h6 {
+        @apply text-base font-semibold text-gray-700;
+    }
+
+    a {
+        @apply text-primary-600 hover:text-primary-700 transition-colors duration-200;
+    }
+
+    p {
+        @apply text-gray-700 leading-relaxed;
+    }
+}
+
+/* Custom component classes */
+@layer components {
+    /* Button Styles */
+    .btn {
+        @apply inline-flex items-center justify-center px-6 py-3 rounded-lg font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed;
+    }
+
+    .btn-primary {
+        @apply bg-primary-600 text-white hover:bg-primary-700 focus:ring-primary-500;
+    }
+
+    .btn-secondary {
+        @apply bg-gray-200 text-gray-800 hover:bg-gray-300 focus:ring-gray-500;
+    }
+
+    .btn-outline {
+        @apply border-2 border-primary-600 text-primary-600 hover:bg-primary-50 focus:ring-primary-500;
+    }
+
+    .btn-danger {
+        @apply bg-red-600 text-white hover:bg-red-700 focus:ring-red-500;
+    }
+
+    .btn-sm {
+        @apply px-4 py-2 text-sm;
+    }
+
+    .btn-lg {
+        @apply px-8 py-4 text-lg;
+    }
+
+    /* Card Styles */
+    .card {
+        @apply bg-white rounded-lg shadow-md overflow-hidden;
+    }
+
+    .card-body {
+        @apply p-6;
+    }
+
+    .card-header {
+        @apply px-6 py-4 border-b border-gray-200 bg-gray-50;
+    }
+
+    .card-footer {
+        @apply px-6 py-4 border-t border-gray-200 bg-gray-50;
+    }
+
+    /* Form Styles */
+    .form-group {
+        @apply mb-4;
+    }
+
+    .form-label {
+        @apply block text-sm font-medium text-gray-700 mb-1;
+    }
+
+    .form-input {
+        @apply w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors duration-200;
+    }
+
+    .form-textarea {
+        @apply w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors duration-200 resize-y min-h-[100px];
+    }
+
+    .form-select {
+        @apply w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors duration-200 bg-white;
+    }
+
+    .form-error {
+        @apply text-sm text-red-600 mt-1;
+    }
+
+    .form-help {
+        @apply text-sm text-gray-500 mt-1;
+    }
+
+    /* Page Container */
+    .page-container {
+        @apply min-h-screen p-6 md:p-8;
+    }
+
+    /* Content Containers */
+    .content-wrapper {
+        @apply max-w-7xl mx-auto;
+    }
+
+    .content-narrow {
+        @apply max-w-3xl mx-auto;
+    }
+
+    .content-wide {
+        @apply max-w-screen-2xl mx-auto;
+    }
+
+    /* Placeholder Message */
+    .placeholder-message {
+        @apply bg-gray-50 border-2 border-dashed border-gray-300 rounded-lg p-8 text-center;
+    }
+
+    /* Section Styles */
+    .section {
+        @apply mb-8;
+    }
+
+    .section-title {
+        @apply text-2xl font-semibold text-gray-900 mb-4;
+    }
+
+    .section-subtitle {
+        @apply text-lg text-gray-600 mb-6;
+    }
+
+    /* Badge Styles */
+    .badge {
+        @apply inline-flex items-center px-3 py-1 rounded-full text-sm font-medium;
+    }
+
+    .badge-primary {
+        @apply bg-primary-100 text-primary-800;
+    }
+
+    .badge-secondary {
+        @apply bg-gray-100 text-gray-800;
+    }
+
+    .badge-success {
+        @apply bg-green-100 text-green-800;
+    }
+
+    .badge-warning {
+        @apply bg-yellow-100 text-yellow-800;
+    }
+
+    .badge-danger {
+        @apply bg-red-100 text-red-800;
+    }
+
+    /* Alert Styles */
+    .alert {
+        @apply p-4 rounded-lg mb-4;
+    }
+
+    .alert-info {
+        @apply bg-blue-50 border border-blue-200 text-blue-800;
+    }
+
+    .alert-success {
+        @apply bg-green-50 border border-green-200 text-green-800;
+    }
+
+    .alert-warning {
+        @apply bg-yellow-50 border border-yellow-200 text-yellow-800;
+    }
+
+    .alert-danger {
+        @apply bg-red-50 border border-red-200 text-red-800;
+    }
+
+    /* Divider */
+    .divider {
+        @apply border-t border-gray-200 my-6;
+    }
+
+    /* Loading Spinner */
+    .spinner {
+        @apply animate-spin rounded-full border-4 border-gray-200 border-t-primary-600;
+    }
+}
+
+/* Custom utility classes */
+@layer utilities {
+    .text-balance {
+        text-wrap: balance;
+    }
+
+    /* Hide scrollbar but keep functionality */
+    .scrollbar-hide {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
+
+    .scrollbar-hide::-webkit-scrollbar {
+        display: none;
+    }
+
+    /* Gradient text */
+    .gradient-text {
+        @apply bg-gradient-to-r from-primary-600 to-primary-800 bg-clip-text text-transparent;
+    }
+
+    /* Glass morphism effect */
+    .glass {
+        @apply bg-white/70 backdrop-blur-md;
+    }
+}
+
+/* Print styles for CV export */
+@media print {
+    .no-print {
+        display: none !important;
+    }
+
+    .page-break-before {
+        page-break-before: always;
+    }
+
+    .page-break-after {
+        page-break-after: always;
+    }
+
+    .page-break-inside-avoid {
+        page-break-inside: avoid;
+    }
+}
