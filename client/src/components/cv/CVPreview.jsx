@@ -376,7 +376,7 @@ const CVPreview = memo(
                 </div>
 
                 {/* Template Preview Area with A4 Page Visualization */}
-                <div className="bg-gray-100 rounded-lg p-6 relative">
+                <div className="bg-gray-100 rounded-lg p-6">
                     {/* Template Container with Zoom */}
                     <div
                         ref={previewRef}
@@ -389,10 +389,12 @@ const CVPreview = memo(
                     >
                         <div data-template>{getTemplate()}</div>
                     </div>
+                </div>
 
-                    {/* Pagination Counter */}
-                    {pageCount > 1 && (
-                        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white px-4 py-2 rounded-full shadow-lg flex items-center gap-3">
+                {/* Pagination Counter - Outside preview area */}
+                {pageCount > 1 && (
+                    <div className="flex justify-center mt-4">
+                        <div className="bg-gray-900 text-white px-4 py-2 rounded-full shadow-lg flex items-center gap-3">
                             <button
                                 onClick={() =>
                                     setCurrentPage((prev) =>
@@ -400,7 +402,7 @@ const CVPreview = memo(
                                     )
                                 }
                                 disabled={currentPage === 1}
-                                className="hover:bg-gray-700 p-1 rounded disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="hover:bg-gray-700 p-1 rounded disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                             >
                                 <svg
                                     className="w-4 h-4"
@@ -426,7 +428,7 @@ const CVPreview = memo(
                                     )
                                 }
                                 disabled={currentPage === pageCount}
-                                className="hover:bg-gray-700 p-1 rounded disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="hover:bg-gray-700 p-1 rounded disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                             >
                                 <svg
                                     className="w-4 h-4"
@@ -443,8 +445,8 @@ const CVPreview = memo(
                                 </svg>
                             </button>
                         </div>
-                    )}
-                </div>
+                    </div>
+                )}
 
                 {/* Preview Info */}
                 <div className="mt-4 flex items-center justify-between text-sm text-gray-500 flex-wrap gap-2">

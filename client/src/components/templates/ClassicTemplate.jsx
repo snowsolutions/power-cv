@@ -37,7 +37,9 @@ const ClassicTemplate = memo(({ data, currentPage = 1, onPageCountChange }) => {
         if (contentRef.current) {
             const contentHeight = contentRef.current.scrollHeight;
             // A4 height in pixels: 297mm ≈ 1122px at 96 DPI
-            const pageHeightPx = 1122;
+            // Use 1050px effective height to leave ~70px padding at bottom of each page
+            // This prevents content from being cut off at page boundaries
+            const pageHeightPx = 1050;
             const pages = Math.ceil(contentHeight / pageHeightPx);
 
             if (onPageCountChange) {
