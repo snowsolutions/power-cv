@@ -5,7 +5,7 @@
 /* Custom base styles */
 @layer base {
     body {
-        @apply font-sans antialiased bg-gray-50 text-gray-900;
+        @apply font-sans antialiased bg-purple-50/30 text-gray-900;
     }
 
     h1 {
@@ -291,7 +291,7 @@
 
     /* Gradient text */
     .gradient-text {
-        @apply bg-gradient-to-r from-primary-600 to-primary-800 bg-clip-text text-transparent;
+        @apply bg-gradient-to-r from-purple-600 to-purple-800 bg-clip-text text-transparent;
     }
 
     /* Glass morphism effect */

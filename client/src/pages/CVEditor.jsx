@@ -155,7 +155,7 @@ function CVEditor() {
     };
 
     return (
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen bg-purple-50/30">
             <div className="w-full">
                 {/* Header Section Removed */}
 
@@ -191,7 +191,7 @@ function CVEditor() {
                     <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
                         <div className="bg-white rounded-lg p-8 shadow-xl">
                             <div className="flex items-center space-x-4">
-                                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div>
                                 <p className="text-lg font-medium text-gray-900">
                                     Loading...
                                 </p>
@@ -203,14 +203,14 @@ function CVEditor() {
                 {/* Main Content Area with Sidebar and Two-Column Layout */}
                 <div className="flex h-screen overflow-hidden">
                     {/* Left Fixed Sidebar - Action Buttons */}
-                    <div className="w-20 bg-white border-r border-gray-100 flex flex-col items-center py-6 gap-6 z-10 shadow-sm print:hidden">
+                    <div className="w-20 bg-white border-r border-purple-100 flex flex-col items-center py-6 gap-6 z-10 shadow-sm print:hidden">
                         <button
                             onClick={handleSave}
                             disabled={isLoading}
                             className={`flex flex-col items-center gap-1 group disabled:opacity-50`}
                             title="Save CV"
                         >
-                            <div className="w-12 h-12 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center group-hover:bg-blue-600 group-hover:text-white transition-all shadow-sm">
+                            <div className="w-12 h-12 bg-purple-50 text-purple-600 rounded-xl flex items-center justify-center group-hover:bg-purple-600 group-hover:text-white transition-all shadow-sm">
                                 <svg
                                     className="w-6 h-6 uppercase font-bold"
                                     fill="none"
@@ -222,7 +222,7 @@ function CVEditor() {
                                     <path d="M17 21v-8H7v8M7 3v5h8" />
                                 </svg>
                             </div>
-                            <span className="text-[10px] font-bold text-gray-500 uppercase tracking-tighter group-hover:text-blue-600">
+                            <span className="text-[10px] font-bold text-gray-500 uppercase tracking-tighter group-hover:text-purple-600">
                                 Save
                             </span>
                         </button>
@@ -233,7 +233,7 @@ function CVEditor() {
                             className={`flex flex-col items-center gap-1 group disabled:opacity-50`}
                             title="Export to JSON"
                         >
-                            <div className="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center group-hover:bg-emerald-600 group-hover:text-white transition-all shadow-sm">
+                            <div className="w-12 h-12 bg-purple-50 text-purple-500 rounded-xl flex items-center justify-center group-hover:bg-purple-500 group-hover:text-white transition-all shadow-sm">
                                 <svg
                                     className="w-6 h-6"
                                     fill="none"
@@ -244,7 +244,7 @@ function CVEditor() {
                                     <path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                                 </svg>
                             </div>
-                            <span className="text-[10px] font-bold text-gray-500 uppercase tracking-tighter group-hover:text-emerald-600">
+                            <span className="text-[10px] font-bold text-gray-500 uppercase tracking-tighter group-hover:text-purple-500">
                                 Export
                             </span>
                         </button>
@@ -277,7 +277,7 @@ function CVEditor() {
                             className={`flex flex-col items-center gap-1 group disabled:opacity-50`}
                             title="Export to PDF"
                         >
-                            <div className="w-12 h-12 bg-red-50 text-red-600 rounded-xl flex items-center justify-center group-hover:bg-red-600 group-hover:text-white transition-all shadow-sm">
+                            <div className="w-12 h-12 bg-purple-50 text-purple-400 rounded-xl flex items-center justify-center group-hover:bg-purple-400 group-hover:text-white transition-all shadow-sm">
                                 <svg
                                     className="w-6 h-6"
                                     fill="none"
@@ -288,18 +288,18 @@ function CVEditor() {
                                     <path d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
                                 </svg>
                             </div>
-                            <span className="text-[10px] font-bold text-gray-500 uppercase tracking-tighter group-hover:text-red-600">
+                            <span className="text-[10px] font-bold text-gray-500 uppercase tracking-tighter group-hover:text-purple-400">
                                 PDF
                             </span>
                         </button>
 
-                        <div className="w-10 h-px bg-gray-100 mx-auto"></div>
+                        <div className="w-10 h-px bg-purple-100 mx-auto"></div>
 
                         {/* Zoom Controls */}
                         <div className="flex flex-col items-center gap-3">
                             <button
                                 onClick={handleZoomIn}
-                                className="w-8 h-8 flex items-center justify-center bg-gray-50 text-gray-600 rounded-lg hover:bg-gray-200 transition-all shadow-sm"
+                                className="w-8 h-8 flex items-center justify-center bg-purple-50 text-purple-600 rounded-lg hover:bg-purple-200 transition-all shadow-sm"
                                 title="Zoom In"
                             >
                                 <svg
@@ -314,14 +314,14 @@ function CVEditor() {
                             </button>
                             <button
                                 onClick={handleResetZoom}
-                                className="text-[10px] font-bold text-gray-400 hover:text-gray-900 transition-colors"
+                                className="text-[10px] font-bold text-purple-400 hover:text-purple-900 transition-colors"
                                 title="Reset Zoom"
                             >
                                 {zoom}%
                             </button>
                             <button
                                 onClick={handleZoomOut}
-                                className="w-8 h-8 flex items-center justify-center bg-gray-50 text-gray-600 rounded-lg hover:bg-gray-200 transition-all shadow-sm"
+                                className="w-8 h-8 flex items-center justify-center bg-purple-50 text-purple-600 rounded-lg hover:bg-purple-200 transition-all shadow-sm"
                                 title="Zoom Out"
                             >
                                 <svg
@@ -336,7 +336,7 @@ function CVEditor() {
                             </button>
                         </div>
 
-                        <div className="w-10 h-px bg-gray-100 mx-auto"></div>
+                        <div className="w-10 h-px bg-purple-100 mx-auto"></div>
 
                         <button
                             onClick={togglePreview}
@@ -348,7 +348,7 @@ function CVEditor() {
                             }
                         >
                             <div
-                                className={`w-12 h-12 rounded-xl flex items-center justify-center transition-all shadow-sm ${isPreviewVisible ? "bg-amber-50 text-amber-600 group-hover:bg-amber-600 group-hover:text-white" : "bg-gray-100 text-gray-600 group-hover:bg-gray-800 group-hover:text-white"}`}
+                                className={`w-12 h-12 rounded-xl flex items-center justify-center transition-all shadow-sm ${isPreviewVisible ? "bg-purple-50 text-purple-600 group-hover:bg-purple-600 group-hover:text-white" : "bg-purple-100 text-purple-600 group-hover:bg-purple-800 group-hover:text-white"}`}
                             >
                                 {isPreviewVisible ? (
                                     <svg
@@ -378,14 +378,14 @@ function CVEditor() {
                             </span>
                         </button>
 
-                        <div className="w-10 h-px bg-gray-100 mx-auto"></div>
+                        <div className="w-10 h-px bg-purple-100 mx-auto"></div>
 
                         <Link
                             to="/dashboard"
                             className="flex flex-col items-center gap-1 group"
                             title="Back to Dashboard"
                         >
-                            <div className="w-12 h-12 bg-gray-50 text-gray-600 rounded-xl flex items-center justify-center group-hover:bg-gray-800 group-hover:text-white transition-all shadow-sm">
+                            <div className="w-12 h-12 bg-purple-50 text-purple-600 rounded-xl flex items-center justify-center group-hover:bg-purple-800 group-hover:text-white transition-all shadow-sm">
                                 <svg
                                     className="w-6 h-6"
                                     fill="none"
@@ -396,7 +396,7 @@ function CVEditor() {
                                     <path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
                                 </svg>
                             </div>
-                            <span className="text-[10px] font-bold text-gray-500 uppercase tracking-tighter group-hover:text-gray-800">
+                            <span className="text-[10px] font-bold text-gray-500 uppercase tracking-tighter group-hover:text-purple-800">
                                 Home
                             </span>
                         </Link>
@@ -404,14 +404,14 @@ function CVEditor() {
 
                     <div className="flex-1 grid grid-cols-1 lg:grid-cols-2">
                         {/* Left Column - Form - Scrollable */}
-                        <div className="overflow-y-auto px-8 py-8 space-y-8 bg-white border-r border-gray-100 scroll-smooth">
+                        <div className="overflow-y-auto px-8 py-8 space-y-8 bg-white border-r border-purple-100 scroll-smooth">
                             {/* CV Header Info - Integrated into Form Area since Top Nav is gone */}
-                            <div className="flex items-center justify-between mb-8 pb-4 border-b border-gray-50">
+                            <div className="flex items-center justify-between mb-8 pb-4 border-b border-purple-50">
                                 <div className="flex items-center gap-3">
                                     <h1 className="text-xl font-bold text-gray-800">
                                         {isEditMode ? "Edit CV" : "New CV"}
                                     </h1>
-                                    <div className="h-4 w-px bg-gray-300"></div>
+                                    <div className="h-4 w-px bg-purple-300"></div>
                                     <div className="flex items-center gap-2">
                                         <input
                                             type="text"
@@ -419,12 +419,12 @@ function CVEditor() {
                                             onChange={(e) =>
                                                 setCVName(e.target.value)
                                             }
-                                            className="px-2 py-1 text-sm font-medium text-gray-600 border-none focus:ring-0 hover:bg-gray-50 rounded-md w-48"
+                                            className="px-2 py-1 text-sm font-medium text-gray-600 border-none focus:ring-0 hover:bg-purple-50 rounded-md w-48"
                                             placeholder="Untitiled CV"
                                         />
                                         {isDirty && (
                                             <div
-                                                className="w-1.5 h-1.5 rounded-full bg-amber-400"
+                                                className="w-1.5 h-1.5 rounded-full bg-purple-400"
                                                 title="Unsaved changes"
                                             ></div>
                                         )}
@@ -508,7 +508,7 @@ function CVEditor() {
                         </div>
 
                         {/* Right Column - Preview - Sticky and Non-Scrollable */}
-                        <div className="bg-gray-50/50 print:hidden relative flex items-center justify-center overflow-hidden h-screen">
+                        <div className="bg-purple-50/30 print:hidden relative flex items-center justify-center overflow-hidden h-screen">
                             <div className="w-full h-full">
                                 <CVPreview
                                     ref={previewRef}
@@ -530,8 +530,8 @@ function CVEditor() {
 
                 {/* Import Confirmation Modal */}
                 {showImportModal && (
-                    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-                        <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
+                    <div className="fixed inset-0 bg-purple-900 bg-opacity-50 flex items-center justify-center z-50 p-4">
+                        <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6 border border-purple-200">
                             <h3 className="text-xl font-semibold text-gray-900 mb-4">
                                 Import CV
                             </h3>
@@ -543,13 +543,13 @@ function CVEditor() {
                             <div className="flex gap-3">
                                 <button
                                     onClick={() => setShowImportModal(false)}
-                                    className="flex-1 px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors font-medium"
+                                    className="flex-1 px-4 py-2 bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200 transition-colors font-medium"
                                 >
                                     Cancel
                                 </button>
                                 <button
                                     onClick={handleImportConfirm}
-                                    className="flex-1 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-medium"
+                                    className="flex-1 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-medium shadow-sm"
                                 >
                                     Import Anyway
                                 </button>

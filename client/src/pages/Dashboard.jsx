@@ -137,7 +137,7 @@ function Dashboard() {
     const availableTemplates = [...new Set(savedCVs.map((cv) => cv.template))];
 
     return (
-        <div className="min-h-screen bg-gray-50 py-8">
+        <div className="min-h-screen bg-purple-50/30 py-8">
             <div className="container mx-auto px-4">
                 <div className="mb-8">
                     <h1 className="text-4xl font-bold text-gray-900">
@@ -177,13 +177,13 @@ function Dashboard() {
                 <div className="mb-6 flex flex-wrap gap-4">
                     <button
                         onClick={handleCreateNew}
-                        className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+                        className="px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-medium shadow-sm"
                     >
                         + Create New CV
                     </button>
                     <Link
                         to="/"
-                        className="px-6 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors font-medium"
+                        className="px-6 py-3 bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200 transition-colors font-medium"
                     >
                         Back to Home
                     </Link>
@@ -198,7 +198,7 @@ function Dashboard() {
                                 placeholder="Search CVs by name..."
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
-                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                className="w-full px-4 py-2 border border-purple-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                             />
                         </div>
                         <div>
@@ -207,7 +207,7 @@ function Dashboard() {
                                 onChange={(e) =>
                                     setFilterTemplate(e.target.value)
                                 }
-                                className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                className="px-4 py-2 border border-purple-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                             >
                                 <option value="all">All Templates</option>
                                 {availableTemplates.map((template) => (
@@ -234,7 +234,7 @@ function Dashboard() {
                 {/* Loading State */}
                 {isLoading && (
                     <div className="flex justify-center items-center py-12">
-                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
                     </div>
                 )}
 
@@ -249,7 +249,7 @@ function Dashboard() {
                         </p>
                         <button
                             onClick={handleCreateNew}
-                            className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+                            className="px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-medium shadow-sm"
                         >
                             Create Your First CV
                         </button>
@@ -271,7 +271,7 @@ function Dashboard() {
                                     setSearchTerm("");
                                     setFilterTemplate("all");
                                 }}
-                                className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+                                className="px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-medium shadow-sm"
                             >
                                 Clear Filters
                             </button>
@@ -283,7 +283,7 @@ function Dashboard() {
                         {filteredCVs.map((cv) => (
                             <div
                                 key={cv.id}
-                                className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow overflow-hidden"
+                                className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow overflow-hidden border border-purple-100"
                             >
                                 <div className="p-6">
                                     <h3 className="text-xl font-semibold text-gray-900 mb-2 truncate">
@@ -302,7 +302,7 @@ function Dashboard() {
                                     <div className="flex gap-2 mb-2">
                                         <button
                                             onClick={() => handleEdit(cv.id)}
-                                            className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+                                            className="flex-1 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-sm font-medium shadow-sm"
                                         >
                                             Edit
                                         </button>
@@ -310,7 +310,7 @@ function Dashboard() {
                                             onClick={() =>
                                                 handleDuplicateCV(cv)
                                             }
-                                            className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-sm font-medium"
+                                            className="px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors text-sm font-medium shadow-sm"
                                             title="Duplicate CV"
                                         >
                                             📋
@@ -319,7 +319,7 @@ function Dashboard() {
                                             onClick={() =>
                                                 handleExportCV(cv.id)
                                             }
-                                            className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm font-medium"
+                                            className="px-4 py-2 bg-purple-400 text-white rounded-lg hover:bg-purple-500 transition-colors text-sm font-medium shadow-sm"
                                             title="Export as JSON"
                                         >
                                             📥
@@ -328,7 +328,7 @@ function Dashboard() {
                                             onClick={() =>
                                                 handleDeleteClick(cv)
                                             }
-                                            className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm font-medium"
+                                            className="px-4 py-2 bg-purple-300 text-white rounded-lg hover:bg-red-600 transition-colors text-sm font-medium shadow-sm"
                                             title="Delete CV"
                                         >
                                             🗑️
@@ -342,8 +342,8 @@ function Dashboard() {
 
                 {/* Delete Confirmation Modal */}
                 {deleteConfirm && (
-                    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-                        <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
+                    <div className="fixed inset-0 bg-purple-900 bg-opacity-50 flex items-center justify-center z-50 p-4">
+                        <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6 border border-purple-200">
                             <h3 className="text-xl font-semibold text-gray-900 mb-4">
                                 Confirm Delete
                             </h3>
@@ -357,13 +357,13 @@ function Dashboard() {
                             <div className="flex gap-3">
                                 <button
                                     onClick={() => setDeleteConfirm(null)}
-                                    className="flex-1 px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors font-medium"
+                                    className="flex-1 px-4 py-2 bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200 transition-colors font-medium"
                                 >
                                     Cancel
                                 </button>
                                 <button
                                     onClick={handleDeleteConfirm}
-                                    className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium"
+                                    className="flex-1 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-medium shadow-sm"
                                 >
                                     Delete
                                 </button>
