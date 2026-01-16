@@ -40,6 +40,7 @@ const ClassicTemplate = memo(({ data, currentPage = 1, onPageCountChange }) => {
             const A4_HEIGHT_PX = viewport ? viewport.offsetHeight : 1122.51;
             const BUFFER = 20; // Buffer to prevent cutting content at page bottom
             const HEADER_MIN_SPACE = 200; // Minimum space needed after a header before page break
+            const SECTION_TITLE_MIN_SPACE = 250; // Minimum space needed for section titles (h2)
 
             // Get the scale factor (due to zoom) to normalize coordinates
             const rootRect = contentRef.current.getBoundingClientRect();
@@ -113,11 +114,13 @@ const ClassicTemplate = memo(({ data, currentPage = 1, onPageCountChange }) => {
                 const pageBottom = currentPage * A4_HEIGHT_PX;
 
                 // Determine if this is a header or a unit that shouldn't be split
-                const isHeader =
+                const isSectionTitle =
                     item.tagName === "H2" ||
-                    item.tagName === "H3" ||
-                    item.classList.contains("job-title") ||
                     item.classList.contains("section-title");
+                const isHeader =
+                    isSectionTitle ||
+                    item.tagName === "H3" ||
+                    item.classList.contains("job-title");
                 const isAvoidBreak =
                     item.classList.contains("avoid-page-break") ||
                     item.classList.contains("page-item");
@@ -136,6 +139,18 @@ const ClassicTemplate = memo(({ data, currentPage = 1, onPageCountChange }) => {
                     itemTop < pageBottom - BUFFER &&
                     itemBottom > pageBottom - BUFFER;
 
+                // Special check for section titles (h2) - need even more space
+                // Check if section title is anywhere in the bottom portion of the page
+                const distanceFromPageTop = itemTop % A4_HEIGHT_PX;
+                const sectionTitleInBottomThird =
+                    isSectionTitle &&
+                    distanceFromPageTop > (A4_HEIGHT_PX * 2) / 3;
+
+                const sectionTitleTooCloseToBottom =
+                    isSectionTitle &&
+                    spaceAfter < SECTION_TITLE_MIN_SPACE &&
+                    spaceAfter > 0;
+
                 const headerTooCloseToBottom =
                     (isHeader || hasHeaderChild) &&
                     spaceAfter < HEADER_MIN_SPACE &&
@@ -146,6 +161,8 @@ const ClassicTemplate = memo(({ data, currentPage = 1, onPageCountChange }) => {
 
                 if (
                     crossesPageBoundary ||
+                    sectionTitleInBottomThird ||
+                    sectionTitleTooCloseToBottom ||
                     headerTooCloseToBottom ||
                     containerWithHeaderNearBottom
                 ) {
@@ -156,6 +173,8 @@ const ClassicTemplate = memo(({ data, currentPage = 1, onPageCountChange }) => {
                         isAvoidBreak ||
                         hasHeaderChild ||
                         spaceLeft < 100 ||
+                        sectionTitleInBottomThird ||
+                        sectionTitleTooCloseToBottom ||
                         headerTooCloseToBottom ||
                         containerWithHeaderNearBottom
                     ) {
@@ -164,7 +183,7 @@ const ClassicTemplate = memo(({ data, currentPage = 1, onPageCountChange }) => {
                         item.classList.add("force-page-break");
 
                         console.log(
-                            `[PageBreak] Pushing item ${index} ("${item.textContent?.substring(0, 30)}...") by ${pushDistance.toFixed(1)}px (reasons: header=${isHeader}, hasChild=${hasHeaderChild}, nearBottom=${headerTooCloseToBottom}, container=${containerWithHeaderNearBottom})`,
+                            `[PageBreak] Pushing item ${index} ("${item.textContent?.substring(0, 30)}...") by ${pushDistance.toFixed(1)}px (reasons: sectionTitle=${isSectionTitle}, inBottomThird=${sectionTitleInBottomThird}, header=${isHeader}, hasChild=${hasHeaderChild}, nearBottom=${headerTooCloseToBottom}, sectionNearBottom=${sectionTitleTooCloseToBottom}, container=${containerWithHeaderNearBottom})`,
                         );
                     }
                 }
