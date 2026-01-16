@@ -1,4 +1,4 @@
-import { useState, memo, useRef } from "react";
+import { useState, memo, useRef, forwardRef, useImperativeHandle, useEffect, useLayoutEffect, useCallback } from "react";
 import PropTypes from "prop-types";
 import { ClassicTemplate } from "../templates";
 import { exportToPDF } from "../../utils/pdfExport";
@@ -10,31 +10,51 @@ import { exportToPDF } from "../../utils/pdfExport";
  * @param {string} props.template - Template name to use
  * @param {boolean} props.isVisible - Whether preview is visible
  * @param {Function} props.onToggleVisibility - Callback to toggle visibility
+ * @param {number} props.zoom - Zoom level percentage
  * @returns {JSX.Element} CV Preview component
  */
 const CVPreview = memo(
-    ({ data, template = "classic", isVisible = true, onToggleVisibility }) => {
-        const [zoom, setZoom] = useState(80);
+    forwardRef(({ data, template = "classic", isVisible = true, onToggleVisibility, zoom = 80 }, ref) => {
         const [isExporting, setIsExporting] = useState(false);
         const [pageCount, setPageCount] = useState(1);
         const [currentPage, setCurrentPage] = useState(1);
         const previewRef = useRef(null);
+        const containerRef = useRef(null);
+        const [autoScale, setAutoScale] = useState(1);
 
-        const handleZoomIn = () => {
-            setZoom((prev) => Math.min(prev + 10, 150));
-        };
+        // Calculate scale to fit height
+        useLayoutEffect(() => {
+            const calculateScale = () => {
+                if (containerRef.current) {
+                    const containerHeight = containerRef.current.offsetHeight;
+                    const containerWidth = containerRef.current.offsetWidth;
 
-        const handleZoomOut = () => {
-            setZoom((prev) => Math.max(prev - 10, 50));
-        };
+                    // A4 height is roughly 1123px at 96dpi
+                    // Minimal padding (e.g., 10px total) to use maximum space
+                    const padding = 10;
+                    const a4Height = 1123;
+                    const a4Width = 794;
 
-        const handleResetZoom = () => {
-            setZoom(100);
-        };
+                    const heightScale = (containerHeight - padding) / a4Height;
+                    const widthScale = (containerWidth - padding) / a4Width;
 
-        const handlePrint = () => {
-            window.print();
-        };
+                    // Use the smaller scale to ensure it fits both ways, 
+                    // but primarily height as requested.
+                    const finalScale = Math.min(heightScale, widthScale);
+                    setAutoScale(finalScale);
+                }
+            };
+
+            calculateScale();
+            window.addEventListener('resize', calculateScale);
+            return () => window.removeEventListener('resize', calculateScale);
+        }, [isVisible]);
+
+        // Expose functions to parent via ref
+        useImperativeHandle(ref, () => ({
+            exportPDF: handleExportPDF,
+            print: () => window.print()
+        }));
 
         const handleExportPDF = async () => {
             if (!previewRef.current) {
@@ -69,13 +89,13 @@ const CVPreview = memo(
         };
 
         // Handle page count updates from template
-        const handlePageCountChange = (count) => {
+        const handlePageCountChange = useCallback((count) => {
             setPageCount(count);
             // Reset to page 1 if current page is beyond new page count
             if (currentPage > count) {
                 setCurrentPage(1);
             }
-        };
+        }, [currentPage]);
 
         // Template mapping
         const getTemplate = () => {
@@ -116,268 +136,56 @@ const CVPreview = memo(
         }
 
         return (
-            <div className="bg-gray-50 rounded-lg shadow-md p-6 print:hidden">
-                {/* Preview Controls */}
-                <div className="flex items-center justify-between mb-6 flex-wrap gap-4">
-                    <h2 className="text-2xl font-semibold text-gray-800">
-                        Live Preview
-                    </h2>
-
-                    <div className="flex items-center gap-2 flex-wrap">
-                        {/* Zoom Controls */}
-                        <div className="flex items-center gap-2 bg-white rounded-lg border border-gray-200 p-1">
-                            <button
-                                onClick={handleZoomOut}
-                                disabled={zoom <= 50}
-                                className="p-2 hover:bg-gray-100 rounded disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                                title="Zoom Out"
-                            >
-                                <svg
-                                    className="w-4 h-4"
-                                    fill="none"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth="2"
-                                    viewBox="0 0 24 24"
-                                    stroke="currentColor"
-                                >
-                                    <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM13 10H7" />
-                                </svg>
-                            </button>
-                            <span className="text-sm font-medium text-gray-700 min-w-[3rem] text-center">
-                                {zoom}%
-                            </span>
-                            <button
-                                onClick={handleZoomIn}
-                                disabled={zoom >= 150}
-                                className="p-2 hover:bg-gray-100 rounded disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                                title="Zoom In"
-                            >
-                                <svg
-                                    className="w-4 h-4"
-                                    fill="none"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth="2"
-                                    viewBox="0 0 24 24"
-                                    stroke="currentColor"
-                                >
-                                    <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v6m3-3H7" />
-                                </svg>
-                            </button>
-                            {zoom !== 100 && (
+            <div className="h-full print:hidden flex flex-col" ref={containerRef}>
+                {/* Transparent overlay for the whole area to handle centering */}
+                <div className="bg-gray-100/50 flex-1 flex flex-col items-center justify-center relative overflow-hidden">
+                    {/* Compact Pagination Counter - Moved to Top Right and Smaller */}
+                    {pageCount > 1 && (
+                        <div className="absolute top-4 right-4 z-20 flex justify-end pointer-events-none">
+                            <div className="bg-gray-900/60 backdrop-blur-md text-white px-2 py-1 rounded-full shadow-lg flex items-center gap-2 pointer-events-auto border border-white/5">
                                 <button
-                                    onClick={handleResetZoom}
-                                    className="px-2 py-1 text-xs bg-gray-100 hover:bg-gray-200 rounded transition-colors"
-                                    title="Reset Zoom"
+                                    onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
+                                    disabled={currentPage === 1}
+                                    className="hover:bg-gray-700 p-0.5 rounded-full disabled:opacity-20 transition-all active:scale-90"
                                 >
-                                    Reset
-                                </button>
-                            )}
-                        </div>
-
-                        {/* Export PDF Button */}
-                        <button
-                            onClick={handleExportPDF}
-                            disabled={isExporting}
-                            className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
-                                isExporting
-                                    ? "bg-gray-400 cursor-not-allowed"
-                                    : "bg-green-600 hover:bg-green-700"
-                            } text-white`}
-                            title="Export as PDF"
-                        >
-                            {isExporting ? (
-                                <>
-                                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-                                    <span className="hidden sm:inline">
-                                        Exporting...
-                                    </span>
-                                </>
-                            ) : (
-                                <>
-                                    <svg
-                                        className="w-5 h-5"
-                                        fill="none"
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth="2"
-                                        viewBox="0 0 24 24"
-                                        stroke="currentColor"
-                                    >
-                                        <path d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                    <svg className="w-3 h-3" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24">
+                                        <path d="M15 19l-7-7 7-7" />
                                     </svg>
-                                    <span className="hidden sm:inline">
-                                        PDF
-                                    </span>
-                                </>
-                            )}
-                        </button>
-
-                        {/* Print Button */}
-                        <button
-                            onClick={handlePrint}
-                            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-                            title="Print CV"
-                        >
-                            <svg
-                                className="w-5 h-5"
-                                fill="none"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth="2"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
-                            >
-                                <path d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
-                            </svg>
-                            <span className="hidden sm:inline">Print</span>
-                        </button>
-
-                        {/* Toggle Visibility Button */}
-                        {onToggleVisibility && (
-                            <button
-                                onClick={onToggleVisibility}
-                                className="flex items-center gap-2 px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors"
-                                title="Hide Preview"
-                            >
-                                <svg
-                                    className="w-5 h-5"
-                                    fill="none"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth="2"
-                                    viewBox="0 0 24 24"
-                                    stroke="currentColor"
+                                </button>
+                                <span className="text-[9px] font-bold tabular-nums tracking-tighter uppercase opacity-80">
+                                    {currentPage}/{pageCount}
+                                </span>
+                                <button
+                                    onClick={() => setCurrentPage((prev) => Math.min(pageCount, prev + 1))}
+                                    disabled={currentPage === pageCount}
+                                    className="hover:bg-gray-700 p-0.5 rounded-full disabled:opacity-20 transition-all active:scale-90"
                                 >
-                                    <path d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
-                                </svg>
-                                <span className="hidden sm:inline">Hide</span>
-                            </button>
-                        )}
-                    </div>
-                </div>
-
-                {/* Pagination Counter - Top of preview area */}
-                {pageCount > 1 && (
-                    <div className="flex justify-center mb-4">
-                        <div className="bg-gray-900 text-white px-4 py-2 rounded-full shadow-lg flex items-center gap-3">
-                            <button
-                                onClick={() =>
-                                    setCurrentPage((prev) =>
-                                        Math.max(1, prev - 1),
-                                    )
-                                }
-                                disabled={currentPage === 1}
-                                className="hover:bg-gray-700 p-1 rounded disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                            >
-                                <svg
-                                    className="w-4 h-4"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    viewBox="0 0 24 24"
-                                >
-                                    <path
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth={2}
-                                        d="M15 19l-7-7 7-7"
-                                    />
-                                </svg>
-                            </button>
-                            <span className="text-sm font-medium">
-                                {currentPage} / {pageCount}
-                            </span>
-                            <button
-                                onClick={() =>
-                                    setCurrentPage((prev) =>
-                                        Math.min(pageCount, prev + 1),
-                                    )
-                                }
-                                disabled={currentPage === pageCount}
-                                className="hover:bg-gray-700 p-1 rounded disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                            >
-                                <svg
-                                    className="w-4 h-4"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    viewBox="0 0 24 24"
-                                >
-                                    <path
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth={2}
-                                        d="M9 5l7 7-7 7"
-                                    />
-                                </svg>
-                            </button>
+                                    <svg className="w-3 h-3" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24">
+                                        <path d="M9 5l7 7-7 7" />
+                                    </svg>
+                                </button>
+                            </div>
                         </div>
-                    </div>
-                )}
+                    )}
 
-                {/* Template Preview Area with A4 Page Visualization */}
-                <div className="bg-gray-100 rounded-lg p-6">
                     {/* Template Container with Zoom */}
                     <div
                         ref={previewRef}
-                        className="mx-auto"
+                        className="flex items-center justify-center"
                         style={{
-                            transform: `scale(${zoom / 100})`,
-                            transformOrigin: "top center",
+                            transform: `scale(${autoScale * (zoom / 100)})`,
+                            transformOrigin: "center center",
                             transition: "transform 0.2s ease-in-out",
                         }}
                     >
-                        <div data-template>{getTemplate()}</div>
+                        <div data-template className="shadow-2xl">{getTemplate()}</div>
                     </div>
                 </div>
 
-                {/* Preview Info */}
-                <div className="mt-4 flex items-center justify-between text-sm text-gray-500 flex-wrap gap-2">
-                    <div className="flex items-center gap-4">
-                        <div className="flex items-center gap-2">
-                            <svg
-                                className="w-4 h-4"
-                                fill="none"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth="2"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
-                            >
-                                <path d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                            </svg>
-                            <span>
-                                Template:{" "}
-                                <span className="font-medium capitalize">
-                                    {template}
-                                </span>
-                            </span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                            <svg
-                                className="w-4 h-4"
-                                fill="none"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth="2"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
-                            >
-                                <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                            </svg>
-                            <span>
-                                <span className="font-medium">{pageCount}</span>{" "}
-                                {pageCount === 1 ? "page" : "pages"} (A4)
-                            </span>
-                        </div>
-                    </div>
-                    <span className="text-xs">
-                        ✨ Preview updates automatically • Renders as PDF export
-                    </span>
-                </div>
+                {/* Preview Info Removed to maximize space */}
             </div>
         );
-    },
+    }),
 );
 
 CVPreview.propTypes = {
@@ -385,6 +193,7 @@ CVPreview.propTypes = {
     template: PropTypes.string,
     isVisible: PropTypes.bool,
     onToggleVisibility: PropTypes.func,
+    zoom: PropTypes.number,
 };
 
 CVPreview.displayName = "CVPreview";

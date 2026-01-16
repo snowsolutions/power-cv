@@ -1,4 +1,4 @@
-import { memo, useEffect, useRef } from "react";
+import { memo, useEffect, useRef, useState } from "react";
 import PropTypes from "prop-types";
 import { FormattedDescription } from "../common";
 
@@ -22,6 +22,7 @@ const ClassicTemplate = memo(({ data, currentPage = 1, onPageCountChange }) => {
         languageCompetencies,
     } = data;
 
+    const [pageMargins, setPageMargins] = useState({});
     const contentRef = useRef(null);
 
     // Helper function to check if a section has content
@@ -35,170 +36,71 @@ const ClassicTemplate = memo(({ data, currentPage = 1, onPageCountChange }) => {
     // Intelligent page break calculation
     useEffect(() => {
         if (contentRef.current) {
-            // Get the actual viewport height in pixels from the DOM
-            const viewport = contentRef.current.closest(".page-viewport");
-            const A4_HEIGHT_PX = viewport ? viewport.offsetHeight : 1122.51;
-            const BUFFER = 20; // Buffer to prevent cutting content at page bottom
-            const HEADER_MIN_SPACE = 200; // Minimum space needed after a header before page break
-            const SECTION_TITLE_MIN_SPACE = 250; // Minimum space needed for section titles (h2)
+            const A4_HEIGHT_PX = 1123; // Use solid pixel value for A4 height
+            const BUFFER = 40; // Buffer to prevent cutting content
+            const HEADER_MIN_SPACE = 200; // Minimum space needed after a header
+            const SECTION_TITLE_MIN_SPACE = 200; // Minimum space needed for section titles (h2)
 
-            // Get the scale factor (due to zoom) to normalize coordinates
             const rootRect = contentRef.current.getBoundingClientRect();
             const scale = rootRect.width / contentRef.current.offsetWidth;
 
-            // Helper to get normalized offsetTop relative to content root
             const getOffsetTop = (el) => {
                 const elRect = el.getBoundingClientRect();
                 return (elRect.top - rootRect.top) / scale;
             };
 
-            // Get all items that should avoid being split by a page break
-            const h2Headers = Array.from(
-                contentRef.current.querySelectorAll("h2.section-title"),
-            );
-            const h3Headers = Array.from(
-                contentRef.current.querySelectorAll("h3"),
-            );
-            const pageItems = Array.from(
-                contentRef.current.querySelectorAll(".page-item"),
-            );
-            const avoidBreaks = Array.from(
-                contentRef.current.querySelectorAll(".avoid-page-break"),
-            );
-            const listItems = Array.from(
-                contentRef.current.querySelectorAll("li"),
-            );
-            const sections = Array.from(
-                contentRef.current.querySelectorAll(".page-section"),
-            );
+            // Select only elements that have stable IDs.
+            // These IDs must be consistent between the logic loop and the JSX render.
+            const allItems = Array.from(contentRef.current.querySelectorAll("[id]"))
+                .filter(el => !el.classList.contains('sliding-content') && !el.classList.contains('page-viewport'))
+                .sort((a, b) => a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING ? -1 : 1);
 
-            // Combine all potential break points
-            const allItems = Array.from(
-                new Set([
-                    ...h2Headers,
-                    ...h3Headers,
-                    ...pageItems,
-                    ...avoidBreaks,
-                    ...listItems,
-                    ...sections,
-                ]),
-            ).sort((a, b) => {
-                // Sort by position in DOM to ensure we process top-to-bottom
-                return a.compareDocumentPosition(b) &
-                    Node.DOCUMENT_POSITION_FOLLOWING
-                    ? -1
-                    : 1;
-            });
+            const newMargins = {};
 
-            console.log(
-                `[ClassicTemplate] Found ${allItems.length} breakable items. A4_HEIGHT=${A4_HEIGHT_PX}px`,
-            );
-
-            // Reset all previous breaks
+            // Reset all previous breaks (temporarily for measurement)
             allItems.forEach((item) => {
                 item.style.marginTop = "";
-                item.classList.remove("force-page-break");
             });
 
-            let pageCount = 1;
-
-            // Iterate through items and apply breaks
-            allItems.forEach((item, index) => {
-                // Re-measure item top because previous items' marginTop might have shifted this one
+            allItems.forEach((item) => {
                 const itemTop = getOffsetTop(item);
                 const itemHeight = item.offsetHeight;
-                const itemBottom = itemTop + itemHeight;
+                const pageNum = Math.floor(itemTop / A4_HEIGHT_PX) + 1;
+                const pageBottom = pageNum * A4_HEIGHT_PX;
 
-                const currentPage =
-                    Math.floor((itemTop + 0.5) / A4_HEIGHT_PX) + 1;
-                const pageBottom = currentPage * A4_HEIGHT_PX;
+                const isH2 = item.tagName === "H2" || item.classList.contains("section-title");
+                const isHeader = isH2 || item.tagName === "H3" || item.classList.contains("job-title") || item.classList.contains("job-header");
+                const isUnit = item.classList.contains("page-item") || item.classList.contains("avoid-page-break") || item.tagName === "LI" || item.tagName === "P";
 
-                // Determine if this is a header or a unit that shouldn't be split
-                const isSectionTitle =
-                    item.tagName === "H2" ||
-                    item.classList.contains("section-title");
-                const isHeader =
-                    isSectionTitle ||
-                    item.tagName === "H3" ||
-                    item.classList.contains("job-title");
-                const isAvoidBreak =
-                    item.classList.contains("avoid-page-break") ||
-                    item.classList.contains("page-item");
+                const spaceAtBottom = pageBottom - itemTop;
 
-                // Check if this is a parent container with headers inside
-                const hasHeaderChild =
-                    item.querySelector("h2") ||
-                    item.querySelector("h3") ||
-                    item.querySelector(".job-title");
+                let shouldPush = false;
 
-                const spaceLeft = pageBottom - itemTop;
-                const spaceAfter = pageBottom - itemBottom;
+                if (isH2) {
+                    // Section titles need enough space for header + ~5 lines of text
+                    if (spaceAtBottom < 150) shouldPush = true;
+                } else if (isHeader) {
+                    // Subheaders need space for title + company + ~3 lines
+                    if (spaceAtBottom < 80) shouldPush = true;
+                } else if (isUnit) {
+                    // Small items that shouldn't be cut.
+                    if (itemTop + itemHeight > pageBottom - 5) shouldPush = true;
+                }
 
-                // Check if item crosses page boundary OR if it's a header too close to page bottom
-                const crossesPageBoundary =
-                    itemTop < pageBottom - BUFFER &&
-                    itemBottom > pageBottom - BUFFER;
-
-                // Special check for section titles (h2) - need even more space
-                // Check if section title is anywhere in the bottom portion of the page
-                const distanceFromPageTop = itemTop % A4_HEIGHT_PX;
-                const sectionTitleInBottomThird =
-                    isSectionTitle &&
-                    distanceFromPageTop > (A4_HEIGHT_PX * 2) / 3;
-
-                const sectionTitleTooCloseToBottom =
-                    isSectionTitle &&
-                    spaceAfter < SECTION_TITLE_MIN_SPACE &&
-                    spaceAfter > 0;
-
-                const headerTooCloseToBottom =
-                    (isHeader || hasHeaderChild) &&
-                    spaceAfter < HEADER_MIN_SPACE &&
-                    spaceAfter > 0;
-
-                const containerWithHeaderNearBottom =
-                    hasHeaderChild && spaceLeft < HEADER_MIN_SPACE;
-
-                if (
-                    crossesPageBoundary ||
-                    sectionTitleInBottomThird ||
-                    sectionTitleTooCloseToBottom ||
-                    headerTooCloseToBottom ||
-                    containerWithHeaderNearBottom
-                ) {
-                    // Logic for pushing:
-                    // Always push headers, avoid-break items, containers with headers, or items with very little space left
-                    if (
-                        isHeader ||
-                        isAvoidBreak ||
-                        hasHeaderChild ||
-                        spaceLeft < 100 ||
-                        sectionTitleInBottomThird ||
-                        sectionTitleTooCloseToBottom ||
-                        headerTooCloseToBottom ||
-                        containerWithHeaderNearBottom
-                    ) {
-                        const pushDistance = pageBottom - itemTop;
+                if (shouldPush) {
+                    const pushDistance = pageBottom - itemTop + 60;
+                    const id = item.id;
+                    if (id) {
+                        newMargins[id] = pushDistance;
                         item.style.marginTop = `${pushDistance}px`;
-                        item.classList.add("force-page-break");
-
-                        console.log(
-                            `[PageBreak] Pushing item ${index} ("${item.textContent?.substring(0, 30)}...") by ${pushDistance.toFixed(1)}px (reasons: sectionTitle=${isSectionTitle}, inBottomThird=${sectionTitleInBottomThird}, header=${isHeader}, hasChild=${hasHeaderChild}, nearBottom=${headerTooCloseToBottom}, sectionNearBottom=${sectionTitleTooCloseToBottom}, container=${containerWithHeaderNearBottom})`,
-                        );
                     }
                 }
             });
 
-            // Final check of total height to update page count
-            const totalHeight = contentRef.current.scrollHeight;
-            const finalPageCount = Math.max(
-                pageCount,
-                Math.ceil(totalHeight / A4_HEIGHT_PX),
-            );
+            setPageMargins(newMargins);
 
-            console.log(
-                `[ClassicTemplate] Final: totalHeight=${totalHeight}px, pageCount=${finalPageCount}`,
-            );
+            const totalHeight = contentRef.current.scrollHeight;
+            const finalPageCount = Math.ceil(totalHeight / A4_HEIGHT_PX);
 
             if (onPageCountChange) {
                 onPageCountChange(finalPageCount);
@@ -206,16 +108,30 @@ const ClassicTemplate = memo(({ data, currentPage = 1, onPageCountChange }) => {
         }
     }, [data, onPageCountChange]);
 
+    // Helper component for section titles
+    const SectionTitle = ({ title, id }) => (
+        <h2
+            id={id}
+            style={{ marginTop: pageMargins[id] ? `${pageMargins[id]}px` : '' }}
+            className={`text-base font-bold text-gray-900 mb-2 pb-1 border-b-2 border-gray-800 uppercase tracking-wide section-title ${pageMargins[id] ? 'force-page-break' : ''}`}
+        >
+            {title}
+        </h2>
+    );
+
     return (
         <div className="classic-template-container relative w-[210mm] mx-auto">
             {/* Page viewport - shows only one page at a time */}
-            <div className="page-viewport h-[297mm] overflow-hidden relative bg-white shadow-lg rounded-lg print:shadow-none print:rounded-none">
+            <div
+                className="page-viewport overflow-hidden relative bg-white shadow-lg rounded-lg print:shadow-none print:rounded-none"
+                style={{ height: '1123px' }}
+            >
                 {/* Sliding content wrapper */}
                 <div
                     ref={contentRef}
                     className="sliding-content transition-transform duration-500 ease-in-out"
                     style={{
-                        transform: `translateY(-${(currentPage - 1) * 297}mm)`,
+                        transform: `translateY(-${(currentPage - 1) * 1123}px)`,
                     }}
                 >
                     {/* Header Section - Centered Traditional Style */}
@@ -228,7 +144,7 @@ const ClassicTemplate = memo(({ data, currentPage = 1, onPageCountChange }) => {
                         <div className="flex flex-wrap items-center justify-center gap-4 text-xs text-gray-700">
                             {personalInfo.email && (
                                 <div className="flex items-center gap-1">
-                                    <span className="font-semibold">
+                                    <span className="font-semibold text-xs">
                                         Email:
                                     </span>
                                     <span>{personalInfo.email}</span>
@@ -238,7 +154,7 @@ const ClassicTemplate = memo(({ data, currentPage = 1, onPageCountChange }) => {
                                 <>
                                     {personalInfo.email && <span>|</span>}
                                     <div className="flex items-center gap-1">
-                                        <span className="font-semibold">
+                                        <span className="font-semibold text-xs">
                                             Phone:
                                         </span>
                                         <span>{personalInfo.phone}</span>
@@ -250,7 +166,7 @@ const ClassicTemplate = memo(({ data, currentPage = 1, onPageCountChange }) => {
                                     {(personalInfo.email ||
                                         personalInfo.phone) && <span>|</span>}
                                     <div className="flex items-center gap-1">
-                                        <span className="font-semibold">
+                                        <span className="font-semibold text-xs">
                                             Address:
                                         </span>
                                         <span>{personalInfo.address}</span>
@@ -265,15 +181,15 @@ const ClassicTemplate = memo(({ data, currentPage = 1, onPageCountChange }) => {
                         {/* Introduction Section */}
                         {hasContent(introduction) && (
                             <section className="mb-6 page-section avoid-page-break">
-                                <h2 className="text-base font-bold text-gray-900 mb-2 pb-1 border-b-2 border-gray-800 uppercase tracking-wide section-title">
-                                    {introduction.sectionTitle ||
-                                        "Professional Summary"}
-                                </h2>
-                                <div
-                                    className="prose prose-xs max-w-none text-gray-700 leading-relaxed text-justify text-xs"
-                                    dangerouslySetInnerHTML={{
-                                        __html: introduction.content,
-                                    }}
+                                <SectionTitle
+                                    title={introduction.sectionTitle || "Professional Summary"}
+                                    id="intro-title"
+                                />
+                                <FormattedDescription
+                                    text={introduction.content}
+                                    idPrefix="intro"
+                                    pageMargins={pageMargins}
+                                    className="text-xs text-gray-700 leading-relaxed text-justify"
                                 />
                             </section>
                         )}
@@ -281,10 +197,10 @@ const ClassicTemplate = memo(({ data, currentPage = 1, onPageCountChange }) => {
                         {/* Professional Skills Section */}
                         {hasContent(professionalSkills) && (
                             <section className="mb-6 page-section avoid-page-break">
-                                <h2 className="text-base font-bold text-gray-900 mb-2 pb-1 border-b-2 border-gray-800 uppercase tracking-wide section-title">
-                                    {professionalSkills.sectionTitle ||
-                                        "Professional Skills"}
-                                </h2>
+                                <SectionTitle
+                                    title={professionalSkills.sectionTitle || "Professional Skills"}
+                                    id="skills-title"
+                                />
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                                     {professionalSkills.items.map((skill) => (
                                         <div
@@ -313,17 +229,22 @@ const ClassicTemplate = memo(({ data, currentPage = 1, onPageCountChange }) => {
                         {/* Work History Section */}
                         {hasContent(workHistory) && (
                             <section className="mb-6 page-section">
-                                <h2 className="text-base font-bold text-gray-900 mb-2 pb-1 border-b-2 border-gray-800 uppercase tracking-wide section-title">
-                                    {workHistory.sectionTitle ||
-                                        "Professional Experience"}
-                                </h2>
+                                <SectionTitle
+                                    title={workHistory.sectionTitle || "Professional Experience"}
+                                    id="work-title"
+                                />
                                 <div className="space-y-5">
-                                    {workHistory.items.map((work) => (
+                                    {workHistory.items.map((work, idx) => (
                                         <div
-                                            key={work.id}
-                                            className="page-item pb-3 avoid-page-break"
+                                            id={`work-item-${idx}`}
+                                            style={{ marginTop: pageMargins[`work-item-${idx}`] ? `${pageMargins[`work-item-${idx}`]}px` : '' }}
+                                            className={`page-item pb-3 avoid-page-break ${pageMargins[`work-item-${idx}`] ? 'force-page-break' : ''}`}
                                         >
-                                            <div className="flex justify-between items-start mb-1">
+                                            <div
+                                                id={`work-header-${idx}`}
+                                                style={{ marginTop: pageMargins[`work-header-${idx}`] ? `${pageMargins[`work-header-${idx}`]}px` : '' }}
+                                                className={`flex justify-between items-start mb-1 job-header ${pageMargins[`work-header-${idx}`] ? 'force-page-break' : ''}`}
+                                            >
                                                 <div className="flex-grow">
                                                     <h3 className="text-sm font-bold text-gray-900 job-title">
                                                         {work.position}
@@ -343,6 +264,8 @@ const ClassicTemplate = memo(({ data, currentPage = 1, onPageCountChange }) => {
                                             {work.description && (
                                                 <FormattedDescription
                                                     text={work.description}
+                                                    idPrefix={`work-desc-${idx}`}
+                                                    pageMargins={pageMargins}
                                                     className="text-xs text-gray-700 leading-relaxed text-justify mt-2"
                                                 />
                                             )}
@@ -355,14 +278,17 @@ const ClassicTemplate = memo(({ data, currentPage = 1, onPageCountChange }) => {
                         {/* Education Section */}
                         {hasContent(educations) && (
                             <section className="mb-6 page-section">
-                                <h2 className="text-base font-bold text-gray-900 mb-2 pb-1 border-b-2 border-gray-800 uppercase tracking-wide section-title">
-                                    {educations.sectionTitle || "Education"}
-                                </h2>
+                                <SectionTitle
+                                    title={educations.sectionTitle || "Education"}
+                                    id="edu-title"
+                                />
                                 <div className="space-y-4">
-                                    {educations.items.map((edu) => (
+                                    {educations.items.map((edu, idx) => (
                                         <div
                                             key={edu.id}
-                                            className="page-item pb-2 avoid-page-break"
+                                            id={`edu-item-${idx}`}
+                                            style={{ marginTop: pageMargins[`edu-item-${idx}`] ? `${pageMargins[`edu-item-${idx}`]}px` : '' }}
+                                            className={`page-item pb-2 avoid-page-break ${pageMargins[`edu-item-${idx}`] ? 'force-page-break' : ''}`}
                                         >
                                             <div className="flex justify-between items-start">
                                                 <div className="flex-grow">
@@ -390,15 +316,17 @@ const ClassicTemplate = memo(({ data, currentPage = 1, onPageCountChange }) => {
                         {/* Certifications Section */}
                         {hasContent(certifications) && (
                             <section className="mb-6 page-section">
-                                <h2 className="text-base font-bold text-gray-900 mb-2 pb-1 border-b-2 border-gray-800 uppercase tracking-wide section-title">
-                                    {certifications.sectionTitle ||
-                                        "Certifications"}
-                                </h2>
+                                <SectionTitle
+                                    title={certifications.sectionTitle || "Certifications"}
+                                    id="cert-title"
+                                />
                                 <div className="space-y-4">
-                                    {certifications.items.map((cert) => (
+                                    {certifications.items.map((cert, idx) => (
                                         <div
                                             key={cert.id}
-                                            className="flex items-start gap-2 page-item pb-2 avoid-page-break"
+                                            id={`cert-item-${idx}`}
+                                            style={{ marginTop: pageMargins[`cert-item-${idx}`] ? `${pageMargins[`cert-item-${idx}`]}px` : '' }}
+                                            className={`flex items-start gap-2 page-item pb-2 avoid-page-break ${pageMargins[`cert-item-${idx}`] ? 'force-page-break' : ''}`}
                                         >
                                             <span className="text-gray-800 font-medium mt-1">
                                                 •
@@ -439,15 +367,17 @@ const ClassicTemplate = memo(({ data, currentPage = 1, onPageCountChange }) => {
                         {/* Activities Section */}
                         {hasContent(activities) && (
                             <section className="mb-6 page-section">
-                                <h2 className="text-base font-bold text-gray-900 mb-2 pb-1 border-b-2 border-gray-800 uppercase tracking-wide section-title">
-                                    {activities.sectionTitle ||
-                                        "Activities & Achievements"}
-                                </h2>
+                                <SectionTitle
+                                    title={activities.sectionTitle || "Activities & Achievements"}
+                                    id="activities-title"
+                                />
                                 <div className="space-y-4">
-                                    {activities.items.map((activity) => (
+                                    {activities.items.map((activity, idx) => (
                                         <div
                                             key={activity.id}
-                                            className="page-item pb-3 avoid-page-break"
+                                            id={`activity-item-${idx}`}
+                                            style={{ marginTop: pageMargins[`activity-item-${idx}`] ? `${pageMargins[`activity-item-${idx}`]}px` : '' }}
+                                            className={`page-item pb-3 avoid-page-break ${pageMargins[`activity-item-${idx}`] ? 'force-page-break' : ''}`}
                                         >
                                             <div className="flex justify-between items-start mb-1">
                                                 <h3 className="text-sm font-bold text-gray-900 flex-grow">
@@ -462,6 +392,8 @@ const ClassicTemplate = memo(({ data, currentPage = 1, onPageCountChange }) => {
                                             {activity.description && (
                                                 <FormattedDescription
                                                     text={activity.description}
+                                                    idPrefix={`act-desc-${idx}`}
+                                                    pageMargins={pageMargins}
                                                     className="text-xs text-gray-700 leading-relaxed text-justify mt-2"
                                                 />
                                             )}
@@ -474,10 +406,10 @@ const ClassicTemplate = memo(({ data, currentPage = 1, onPageCountChange }) => {
                         {/* Language Competencies Section */}
                         {hasContent(languageCompetencies) && (
                             <section className="mb-6 page-section avoid-page-break">
-                                <h2 className="text-base font-bold text-gray-900 mb-2 pb-1 border-b-2 border-gray-800 uppercase tracking-wide section-title">
-                                    {languageCompetencies.sectionTitle ||
-                                        "Languages"}
-                                </h2>
+                                <SectionTitle
+                                    title={languageCompetencies.sectionTitle || "Languages"}
+                                    id="lang-title"
+                                />
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                                     {languageCompetencies.items.map((lang) => (
                                         <div
@@ -503,75 +435,80 @@ const ClassicTemplate = memo(({ data, currentPage = 1, onPageCountChange }) => {
                             </section>
                         )}
                     </div>
+
+                    {/* Print Styles */}
+                    <style>{`
+                        .page-viewport {
+                            position: relative;
+                        }
+
+                        .sliding-content {
+                            will-change: transform;
+                        }
+
+                        .force-page-break {
+                            page-break-before: always !important;
+                            break-before: page !important;
+                        }
+
+                        .page-section,
+                        .page-item,
+                        .page-section-header,
+                        .job-header,
+                        .section-title {
+                            page-break-inside: avoid !important;
+                            break-inside: avoid !important;
+                        }
+
+                        @media print {
+                            .classic-template-container {
+                                box-shadow: none !important;
+                                border-radius: 0 !important;
+                            }
+
+                            .page-viewport {
+                                height: auto !important;
+                                overflow: visible !important;
+                            }
+
+                            .sliding-content {
+                                transform: none !important;
+                            }
+
+                            .force-page-break {
+                                margin-top: 0 !important;
+                                page-break-before: always !important;
+                                break-before: page !important;
+                            }
+
+                            .page-section,
+                            .page-item,
+                            .page-section-header,
+                            .job-header,
+                            .section-title {
+                                page-break-inside: avoid !important;
+                                break-inside: avoid !important;
+                            }
+
+                            @page {
+                                margin: 0.5in;
+                                size: A4;
+                            }
+                        }
+
+                        @media screen {
+                            .page-section,
+                            .page-item {
+                                margin-bottom: 1rem;
+                            }
+                        }
+                    `}</style>
                 </div>
             </div>
-
-            {/* Print Styles */}
-            <style>{`
-                .page-viewport {
-                    position: relative;
-                }
-
-                .sliding-content {
-                    will-change: transform;
-                }
-
-                .force-page-break {
-                    page-break-before: always !important;
-                    break-before: page !important;
-                }
-
-                .page-section,
-                .page-item,
-                .page-section-header {
-                    page-break-inside: avoid !important;
-                    break-inside: avoid !important;
-                }
-
-                @media print {
-                    .classic-template-container {
-                        box-shadow: none !important;
-                        border-radius: 0 !important;
-                    }
-
-                    .page-viewport {
-                        height: auto !important;
-                        overflow: visible !important;
-                    }
-
-                    .sliding-content {
-                        transform: none !important;
-                    }
-
-                    .force-page-break {
-                        margin-top: 0 !important;
-                        page-break-before: always !important;
-                        break-before: page !important;
-                    }
-
-                    .page-section,
-                    .page-item,
-                    .page-section-header {
-                        page-break-inside: avoid !important;
-                        break-inside: avoid !important;
-                    }
-
-                    @page {
-                        margin: 0.5in;
-                        size: A4;
-                    }
-                }
-
-                @media screen {
-                    .page-section,
-                    .page-item {
-                        margin-bottom: 1rem;
-                    }
-                }
-            `}</style>
         </div>
     );
 });
+
 ClassicTemplate.displayName = "ClassicTemplate";
 
 ClassicTemplate.propTypes = {
