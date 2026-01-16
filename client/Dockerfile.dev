@@ -1,0 +1,17 @@
+# Development Dockerfile for Power CV Client
+# Node.js 24 Alpine - Uses host node_modules via volume mount
+
+FROM node:24-alpine
+
+# Install pnpm 9.x to match lockfile version
+RUN corepack enable && corepack prepare pnpm@9 --activate
+
+# Set working directory
+WORKDIR /app
+
+# Expose Vite dev server port
+EXPOSE 5173
+
+# Development with Vite HMR
+# Source code and node_modules will be mounted via volumes
+CMD ["pnpm", "dev", "--host", "0.0.0.0"]

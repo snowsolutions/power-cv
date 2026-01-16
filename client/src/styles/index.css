@@ -128,11 +128,11 @@
     }
 
     .formatted-html ul {
-        @apply list-disc list-inside space-y-1 my-2;
+        @apply list-disc list-outside space-y-1 my-2 ml-5;
     }
 
     .formatted-html ol {
-        @apply list-decimal list-inside space-y-1 my-2;
+        @apply list-decimal list-outside space-y-1 my-2 ml-5;
     }
 
     .formatted-html li {

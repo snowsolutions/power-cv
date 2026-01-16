@@ -1,0 +1,32 @@
+# Development Dockerfile for Power CV Server
+# Node.js 24 Alpine with pnpm 9.x and nodemon for hot-reloading
+
+FROM node:24-alpine
+
+# Install OpenSSL libraries for Prisma (Alpine uses OpenSSL 3)
+RUN apk add --no-cache openssl openssl-dev libc6-compat
+
+# Install pnpm 9.x to match lockfile version
+RUN corepack enable && corepack prepare pnpm@9 --activate
+
+# Set working directory
+WORKDIR /app
+
+# Copy package files
+COPY package.json pnpm-lock.yaml* ./
+
+# Copy prisma schema
+COPY prisma ./prisma
+
+# Install dependencies and generate Prisma client
+RUN pnpm install --frozen-lockfile && pnpm prisma:generate
+
+# Copy application code (will be overridden by volume mount in dev)
+COPY . .
+
+# Expose port
+EXPOSE 5001
+
+# Development with nodemon (hot-reloading)
+# Source code will be mounted via volume for live updates
+CMD ["pnpm", "dev"]

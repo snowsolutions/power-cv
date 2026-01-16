@@ -1,0 +1,70 @@
+# Dependencies
+node_modules
+npm-debug.log
+pnpm-debug.log
+yarn-error.log
+.pnpm-store
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Build output
+dist
+build
+
+# IDE and editor files
+.vscode
+.idea
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Git
+.git
+.gitignore
+.gitattributes
+
+# Documentation
+README.md
+*.md
+docs
+EXPORT_VERIFICATION.md
+IMPORT_DEBUG.md
+
+# Test files
+test
+tests
+*.test.js
+*.test.jsx
+*.spec.js
+*.spec.jsx
+coverage
+__tests__
+
+# CI/CD
+.github
+.gitlab-ci.yml
+.travis.yml
+
+# Docker
+Dockerfile
+.dockerignore
+docker-compose*.yml
+
+# Vite
+.vite
+*.log
+
+# Misc
+.npmrc
+.editorconfig
+.eslintrc*
+.prettierrc*
+tsconfig.json
+
+# Development cache
+.cache
+.parcel-cache
