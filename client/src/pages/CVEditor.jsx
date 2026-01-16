@@ -26,6 +26,7 @@ function CVEditor() {
         currentCV,
         updatePersonalInfo,
         updateSectionTitle,
+        updateShowLevel,
         updateIntroduction,
         addItem,
         updateItem,
@@ -44,7 +45,7 @@ function CVEditor() {
         importCV,
     } = useCV();
 
-    const [zoom, setZoom] = useState(80);
+    const [zoom, setZoom] = useState(90);
     const previewRef = useRef(null);
 
     const handleZoomIn = () => setZoom((prev) => Math.min(prev + 10, 150));
@@ -162,10 +163,11 @@ function CVEditor() {
                 {saveMessage && (
                     <div className="fixed top-6 right-6 z-30 animate-slide-in">
                         <div
-                            className={`px-4 py-3 rounded-lg shadow-lg ${saveMessage.type === "success"
-                                ? "bg-green-100 text-green-800 border border-green-200"
-                                : "bg-red-100 text-red-800 border border-red-200"
-                                }`}
+                            className={`px-4 py-3 rounded-lg shadow-lg ${
+                                saveMessage.type === "success"
+                                    ? "bg-green-100 text-green-800 border border-green-200"
+                                    : "bg-red-100 text-red-800 border border-red-200"
+                            }`}
                         >
                             <p className="font-medium text-sm">
                                 {saveMessage.text}
@@ -209,12 +211,20 @@ function CVEditor() {
                             title="Save CV"
                         >
                             <div className="w-12 h-12 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center group-hover:bg-blue-600 group-hover:text-white transition-all shadow-sm">
-                                <svg className="w-6 h-6 uppercase font-bold" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                                <svg
+                                    className="w-6 h-6 uppercase font-bold"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeWidth="2.5"
+                                    viewBox="0 0 24 24"
+                                >
                                     <path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z" />
                                     <path d="M17 21v-8H7v8M7 3v5h8" />
                                 </svg>
                             </div>
-                            <span className="text-[10px] font-bold text-gray-500 uppercase tracking-tighter group-hover:text-blue-600">Save</span>
+                            <span className="text-[10px] font-bold text-gray-500 uppercase tracking-tighter group-hover:text-blue-600">
+                                Save
+                            </span>
                         </button>
 
                         <button
@@ -224,11 +234,19 @@ function CVEditor() {
                             title="Export to JSON"
                         >
                             <div className="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center group-hover:bg-emerald-600 group-hover:text-white transition-all shadow-sm">
-                                <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                                <svg
+                                    className="w-6 h-6"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeWidth="2.5"
+                                    viewBox="0 0 24 24"
+                                >
                                     <path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                                 </svg>
                             </div>
-                            <span className="text-[10px] font-bold text-gray-500 uppercase tracking-tighter group-hover:text-emerald-600">Export</span>
+                            <span className="text-[10px] font-bold text-gray-500 uppercase tracking-tighter group-hover:text-emerald-600">
+                                Export
+                            </span>
                         </button>
 
                         <button
@@ -238,11 +256,19 @@ function CVEditor() {
                             title="Import from JSON"
                         >
                             <div className="w-12 h-12 bg-purple-50 text-purple-600 rounded-xl flex items-center justify-center group-hover:bg-purple-600 group-hover:text-white transition-all shadow-sm">
-                                <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                                <svg
+                                    className="w-6 h-6"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeWidth="2.5"
+                                    viewBox="0 0 24 24"
+                                >
                                     <path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
                                 </svg>
                             </div>
-                            <span className="text-[10px] font-bold text-gray-500 uppercase tracking-tighter group-hover:text-purple-600">Import</span>
+                            <span className="text-[10px] font-bold text-gray-500 uppercase tracking-tighter group-hover:text-purple-600">
+                                Import
+                            </span>
                         </button>
 
                         <button
@@ -252,11 +278,19 @@ function CVEditor() {
                             title="Export to PDF"
                         >
                             <div className="w-12 h-12 bg-red-50 text-red-600 rounded-xl flex items-center justify-center group-hover:bg-red-600 group-hover:text-white transition-all shadow-sm">
-                                <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                                <svg
+                                    className="w-6 h-6"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeWidth="2.5"
+                                    viewBox="0 0 24 24"
+                                >
                                     <path d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
                                 </svg>
                             </div>
-                            <span className="text-[10px] font-bold text-gray-500 uppercase tracking-tighter group-hover:text-red-600">PDF</span>
+                            <span className="text-[10px] font-bold text-gray-500 uppercase tracking-tighter group-hover:text-red-600">
+                                PDF
+                            </span>
                         </button>
 
                         <div className="w-10 h-px bg-gray-100 mx-auto"></div>
@@ -268,7 +302,13 @@ function CVEditor() {
                                 className="w-8 h-8 flex items-center justify-center bg-gray-50 text-gray-600 rounded-lg hover:bg-gray-200 transition-all shadow-sm"
                                 title="Zoom In"
                             >
-                                <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                                <svg
+                                    className="w-5 h-5"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeWidth="2.5"
+                                    viewBox="0 0 24 24"
+                                >
                                     <path d="M12 4v16m8-8H4" />
                                 </svg>
                             </button>
@@ -284,7 +324,13 @@ function CVEditor() {
                                 className="w-8 h-8 flex items-center justify-center bg-gray-50 text-gray-600 rounded-lg hover:bg-gray-200 transition-all shadow-sm"
                                 title="Zoom Out"
                             >
-                                <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                                <svg
+                                    className="w-5 h-5"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeWidth="2.5"
+                                    viewBox="0 0 24 24"
+                                >
                                     <path d="M20 12H4" />
                                 </svg>
                             </button>
@@ -295,21 +341,41 @@ function CVEditor() {
                         <button
                             onClick={togglePreview}
                             className="flex flex-col items-center gap-1 group"
-                            title={isPreviewVisible ? "Hide Preview" : "Show Preview"}
+                            title={
+                                isPreviewVisible
+                                    ? "Hide Preview"
+                                    : "Show Preview"
+                            }
                         >
-                            <div className={`w-12 h-12 rounded-xl flex items-center justify-center transition-all shadow-sm ${isPreviewVisible ? "bg-amber-50 text-amber-600 group-hover:bg-amber-600 group-hover:text-white" : "bg-gray-100 text-gray-600 group-hover:bg-gray-800 group-hover:text-white"}`}>
+                            <div
+                                className={`w-12 h-12 rounded-xl flex items-center justify-center transition-all shadow-sm ${isPreviewVisible ? "bg-amber-50 text-amber-600 group-hover:bg-amber-600 group-hover:text-white" : "bg-gray-100 text-gray-600 group-hover:bg-gray-800 group-hover:text-white"}`}
+                            >
                                 {isPreviewVisible ? (
-                                    <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                                    <svg
+                                        className="w-6 h-6"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        strokeWidth="2.5"
+                                        viewBox="0 0 24 24"
+                                    >
                                         <path d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
                                     </svg>
                                 ) : (
-                                    <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                                    <svg
+                                        className="w-6 h-6"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        strokeWidth="2.5"
+                                        viewBox="0 0 24 24"
+                                    >
                                         <path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                                         <path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                                     </svg>
                                 )}
                             </div>
-                            <span className="text-[10px] font-bold text-gray-500 uppercase tracking-tighter group-hover:text-gray-800">{isPreviewVisible ? "Hide" : "Show"}</span>
+                            <span className="text-[10px] font-bold text-gray-500 uppercase tracking-tighter group-hover:text-gray-800">
+                                {isPreviewVisible ? "Hide" : "Show"}
+                            </span>
                         </button>
 
                         <div className="w-10 h-px bg-gray-100 mx-auto"></div>
@@ -320,11 +386,19 @@ function CVEditor() {
                             title="Back to Dashboard"
                         >
                             <div className="w-12 h-12 bg-gray-50 text-gray-600 rounded-xl flex items-center justify-center group-hover:bg-gray-800 group-hover:text-white transition-all shadow-sm">
-                                <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                                <svg
+                                    className="w-6 h-6"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeWidth="2.5"
+                                    viewBox="0 0 24 24"
+                                >
                                     <path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
                                 </svg>
                             </div>
-                            <span className="text-[10px] font-bold text-gray-500 uppercase tracking-tighter group-hover:text-gray-800">Home</span>
+                            <span className="text-[10px] font-bold text-gray-500 uppercase tracking-tighter group-hover:text-gray-800">
+                                Home
+                            </span>
                         </Link>
                     </div>
 
@@ -342,12 +416,17 @@ function CVEditor() {
                                         <input
                                             type="text"
                                             value={currentCV.name}
-                                            onChange={(e) => setCVName(e.target.value)}
+                                            onChange={(e) =>
+                                                setCVName(e.target.value)
+                                            }
                                             className="px-2 py-1 text-sm font-medium text-gray-600 border-none focus:ring-0 hover:bg-gray-50 rounded-md w-48"
                                             placeholder="Untitiled CV"
                                         />
                                         {isDirty && (
-                                            <div className="w-1.5 h-1.5 rounded-full bg-amber-400" title="Unsaved changes"></div>
+                                            <div
+                                                className="w-1.5 h-1.5 rounded-full bg-amber-400"
+                                                title="Unsaved changes"
+                                            ></div>
                                         )}
                                     </div>
                                 </div>
@@ -381,16 +460,27 @@ function CVEditor() {
                                 onUpdateSectionTitle={updateSectionTitle}
                             />
 
-                            <CertificationsForm
-                                certifications={currentCV.data.certifications}
+                            <ProfessionalSkillsForm
+                                professionalSkills={
+                                    currentCV.data.professionalSkills
+                                }
+                                onAddItem={addItem}
+                                onUpdateItem={updateItem}
+                                onRemoveItem={removeItem}
+                                onUpdateSectionTitle={updateSectionTitle}
+                                onUpdateShowLevel={updateShowLevel}
+                            />
+
+                            <EducationsForm
+                                educations={currentCV.data.educations}
                                 onAddItem={addItem}
                                 onUpdateItem={updateItem}
                                 onRemoveItem={removeItem}
                                 onUpdateSectionTitle={updateSectionTitle}
                             />
 
-                            <EducationsForm
-                                educations={currentCV.data.educations}
+                            <CertificationsForm
+                                certifications={currentCV.data.certifications}
                                 onAddItem={addItem}
                                 onUpdateItem={updateItem}
                                 onRemoveItem={removeItem}
@@ -405,16 +495,6 @@ function CVEditor() {
                                 onUpdateSectionTitle={updateSectionTitle}
                             />
 
-                            <ProfessionalSkillsForm
-                                professionalSkills={
-                                    currentCV.data.professionalSkills
-                                }
-                                onAddItem={addItem}
-                                onUpdateItem={updateItem}
-                                onRemoveItem={removeItem}
-                                onUpdateSectionTitle={updateSectionTitle}
-                            />
-
                             <LanguageCompetenciesForm
                                 languageCompetencies={
                                     currentCV.data.languageCompetencies
@@ -423,6 +503,7 @@ function CVEditor() {
                                 onUpdateItem={updateItem}
                                 onRemoveItem={removeItem}
                                 onUpdateSectionTitle={updateSectionTitle}
+                                onUpdateShowLevel={updateShowLevel}
                             />
                         </div>
 

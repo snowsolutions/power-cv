@@ -35,10 +35,12 @@ export const getInitialCVData = () => ({
     },
     professionalSkills: {
         sectionTitle: DEFAULT_SECTION_TITLES.professionalSkills,
+        showLevel: true,
         items: [],
     },
     languageCompetencies: {
         sectionTitle: DEFAULT_SECTION_TITLES.languageCompetencies,
+        showLevel: true,
         items: [],
     },
 });

@@ -1,7 +1,19 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import PropTypes from "prop-types";
-import { Input, Textarea, Button, SectionTitleEditor } from "../common";
-import { DEFAULT_SECTION_TITLES } from "../../utils/constants";
+import ReactQuill from "react-quill";
+import "react-quill/dist/quill.snow.css";
+import {
+    Input,
+    Button,
+    SectionTitleEditor,
+    AIButton,
+    AIImproveModal,
+} from "../common";
+import {
+    DEFAULT_SECTION_TITLES,
+    sortWorkHistoryByDate,
+} from "../../utils/constants";
+import useDebounce from "../../hooks/useDebounce";
 
 const WorkHistoryItem = ({
     item,
@@ -10,9 +22,77 @@ const WorkHistoryItem = ({
     isExpanded,
     onToggle,
 }) => {
+    // Local state for immediate UI updates
+    const [localDescription, setLocalDescription] = useState(item.description);
+    const [lastPropDescription, setLastPropDescription] = useState(
+        item.description,
+    );
+    const [isAIModalOpen, setIsAIModalOpen] = useState(false);
+
+    // Debounced value that will update the store
+    const debouncedDescription = useDebounce(localDescription, 300);
+
+    // Update local state when prop changes (for external updates like import)
+    useEffect(() => {
+        if (
+            item.description !== lastPropDescription &&
+            item.description !== localDescription
+        ) {
+            setLocalDescription(item.description);
+            setLastPropDescription(item.description);
+        }
+    }, [item.description, lastPropDescription, localDescription]);
+
+    // Update store when debounced value changes (from user edits)
+    useEffect(() => {
+        // Only update if debounced value matches current local state
+        // This prevents stale debounced values from overwriting AI-accepted content
+        if (
+            debouncedDescription !== item.description &&
+            debouncedDescription !== lastPropDescription &&
+            debouncedDescription === localDescription
+        ) {
+            onUpdate("workHistory", item.id, {
+                description: debouncedDescription,
+            });
+            setLastPropDescription(debouncedDescription);
+        }
+    }, [
+        debouncedDescription,
+        item.description,
+        item.id,
+        onUpdate,
+        lastPropDescription,
+        localDescription,
+    ]);
+
     const handleFieldChange = (field, value) => {
         onUpdate("workHistory", item.id, { [field]: value });
     };
+
+    const handleDescriptionChange = (content) => {
+        setLocalDescription(content);
+    };
+
+    const handleAIAccept = (improvedContent) => {
+        // Update all states synchronously to prevent reversion
+        setLastPropDescription(improvedContent);
+        setLocalDescription(improvedContent);
+        // Call onUpdate to persist to store
+        onUpdate("workHistory", item.id, { description: improvedContent });
+    };
+
+    // Quill toolbar modules configuration
+    const modules = {
+        toolbar: [
+            ["bold", "italic", "underline"],
+            [{ list: "ordered" }, { list: "bullet" }],
+            ["clean"],
+        ],
+    };
+
+    // Quill editor formats
+    const formats = ["bold", "italic", "underline", "list", "bullet"];
 
     return (
         <div className="border border-gray-200 rounded-lg mb-4 overflow-hidden">
@@ -117,16 +197,114 @@ const WorkHistoryItem = ({
                         />
                     </div>
 
-                    <Textarea
-                        label="Job Description"
-                        value={item.description}
-                        onChange={(e) =>
-                            handleFieldChange("description", e.target.value)
+                    {/* Rich Text Editor for Description */}
+                    <div className="mb-4">
+                        <div className="flex items-center justify-between mb-2">
+                            <label className="block text-sm font-medium text-gray-700">
+                                Job Description
+                            </label>
+                            <AIButton
+                                onClick={() => setIsAIModalOpen(true)}
+                                title="Improve with AI"
+                            />
+                        </div>
+                        <div className="quill-wrapper-sm">
+                            <ReactQuill
+                                theme="snow"
+                                value={localDescription}
+                                onChange={handleDescriptionChange}
+                                modules={modules}
+                                formats={formats}
+                                placeholder="Describe your responsibilities, achievements, and key projects..."
+                                className="bg-white"
+                            />
+                        </div>
+                        <p className="text-xs text-gray-500 mt-2">
+                            Highlight your accomplishments and impact. Use
+                            bullet points for better readability.
+                        </p>
+
+                        {/* AI Improve Modal */}
+                        <AIImproveModal
+                            isOpen={isAIModalOpen}
+                            onClose={() => setIsAIModalOpen(false)}
+                            currentContent={localDescription}
+                            sectionType="workHistory"
+                            onAccept={handleAIAccept}
+                            title={`Improve Job Description - ${item.position || "Work Experience"}`}
+                        />
+                    </div>
+
+                    {/* Custom Styles for Quill Editor */}
+                    <style>{`
+                        .quill-wrapper-sm .ql-container {
+                            min-height: 150px;
+                            font-size: 14px;
+                            font-family: inherit;
                         }
-                        placeholder="Describe your responsibilities, achievements, and key projects..."
-                        rows={6}
-                        helpText="Highlight your accomplishments and impact"
-                    />
+
+                        .quill-wrapper-sm .ql-editor {
+                            min-height: 150px;
+                        }
+
+                        .quill-wrapper-sm .ql-toolbar {
+                            border-top-left-radius: 0.375rem;
+                            border-top-right-radius: 0.375rem;
+                            background-color: #f9fafb;
+                        }
+
+                        .quill-wrapper-sm .ql-container {
+                            border-bottom-left-radius: 0.375rem;
+                            border-bottom-right-radius: 0.375rem;
+                        }
+
+                        .quill-wrapper-sm .ql-editor.ql-blank::before {
+                            color: #9ca3af;
+                            font-style: normal;
+                        }
+
+                        .quill-wrapper-sm .ql-snow .ql-stroke {
+                            stroke: #4b5563;
+                        }
+
+                        .quill-wrapper-sm .ql-snow .ql-fill {
+                            fill: #4b5563;
+                        }
+
+                        .quill-wrapper-sm .ql-snow .ql-picker-label {
+                            color: #4b5563;
+                        }
+
+                        .quill-wrapper-sm .ql-toolbar button:hover,
+                        .quill-wrapper-sm .ql-toolbar button:focus {
+                            color: #2563eb;
+                        }
+
+                        .quill-wrapper-sm .ql-toolbar button:hover .ql-stroke,
+                        .quill-wrapper-sm .ql-toolbar button:focus .ql-stroke {
+                            stroke: #2563eb;
+                        }
+
+                        .quill-wrapper-sm .ql-toolbar button:hover .ql-fill,
+                        .quill-wrapper-sm .ql-toolbar button:focus .ql-fill {
+                            fill: #2563eb;
+                        }
+
+                        .quill-wrapper-sm .ql-snow.ql-toolbar button.ql-active,
+                        .quill-wrapper-sm .ql-snow .ql-toolbar button.ql-active {
+                            color: #2563eb;
+                        }
+
+                        .quill-wrapper-sm .ql-snow.ql-toolbar button.ql-active .ql-stroke,
+                        .quill-wrapper-sm .ql-snow .ql-toolbar button.ql-active .ql-stroke {
+                            stroke: #2563eb;
+                        }
+
+                        .quill-wrapper-sm .ql-snow.ql-toolbar button.ql-active .ql-fill,
+                        .quill-wrapper-sm .ql-snow .ql-toolbar button.ql-active .ql-fill {
+                            fill: #2563eb;
+                        }
+                    `}</style>
                 </div>
             )}
         </div>
@@ -188,6 +366,9 @@ const WorkHistoryForm = ({
             setExpandedItems(new Set(workHistory.items.map((item) => item.id)));
         }
     };
+
+    // Sort work history items by date (latest first)
+    const sortedItems = sortWorkHistoryByDate(workHistory.items);
 
     return (
         <div className="bg-white rounded-lg shadow-md p-6">
@@ -254,7 +435,7 @@ const WorkHistoryForm = ({
                         </p>
                     </div>
                 ) : (
-                    workHistory.items.map((item) => (
+                    sortedItems.map((item) => (
                         <WorkHistoryItem
                             key={item.id}
                             item={item}
@@ -296,6 +477,9 @@ const WorkHistoryForm = ({
                                 <li>
                                     Focus on impact and accomplishments, not
                                     just duties
+                                </li>
+                                <li>
+                                    Use bullet points for better readability
                                 </li>
                             </ul>
                         </div>

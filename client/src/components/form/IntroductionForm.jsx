@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
-import { SectionTitleEditor } from "../common";
+import { SectionTitleEditor, AIButton, AIImproveModal } from "../common";
 import { DEFAULT_SECTION_TITLES } from "../../utils/constants";
 import useDebounce from "../../hooks/useDebounce";
 
@@ -12,6 +12,7 @@ const IntroductionForm = ({ introduction, onUpdate, onUpdateSectionTitle }) => {
     const [lastPropContent, setLastPropContent] = useState(
         introduction.content,
     );
+    const [isAIModalOpen, setIsAIModalOpen] = useState(false);
 
     // Debounced value that will update the store
     const debouncedContent = useDebounce(localContent, 300);
@@ -33,18 +34,35 @@ const IntroductionForm = ({ introduction, onUpdate, onUpdateSectionTitle }) => {
 
     // Update store when debounced value changes (from user edits)
     useEffect(() => {
+        // Only update if debounced value matches current local state
+        // This prevents stale debounced values from overwriting AI-accepted content
         if (
             debouncedContent !== introduction.content &&
-            debouncedContent !== lastPropContent
+            debouncedContent !== lastPropContent &&
+            debouncedContent === localContent
         ) {
             console.log("[IntroductionForm] Updating store with user changes");
             onUpdate(debouncedContent);
             setLastPropContent(debouncedContent);
         }
-    }, [debouncedContent, introduction.content, onUpdate, lastPropContent]);
+    }, [
+        debouncedContent,
+        introduction.content,
+        onUpdate,
+        lastPropContent,
+        localContent,
+    ]);
 
     const handleContentChange = (content) => {
         setLocalContent(content);
+    };
+
+    const handleAIAccept = (improvedContent) => {
+        // Update all states synchronously to prevent reversion
+        setLastPropContent(improvedContent);
+        setLocalContent(improvedContent);
+        // Call onUpdate to persist to store
+        onUpdate(improvedContent);
     };
 
     // Quill toolbar modules configuration
@@ -87,9 +105,15 @@ const IntroductionForm = ({ introduction, onUpdate, onUpdateSectionTitle }) => {
 
             {/* Rich Text Editor */}
             <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Content
-                </label>
+                <div className="flex items-center justify-between mb-2">
+                    <label className="block text-sm font-medium text-gray-700">
+                        Content
+                    </label>
+                    <AIButton
+                        onClick={() => setIsAIModalOpen(true)}
+                        title="Improve with AI"
+                    />
+                </div>
                 <div className="quill-wrapper">
                     <ReactQuill
                         theme="snow"
@@ -133,6 +157,16 @@ const IntroductionForm = ({ introduction, onUpdate, onUpdateSectionTitle }) => {
                     </div>
                 </div>
             </div>
+
+            {/* AI Improve Modal */}
+            <AIImproveModal
+                isOpen={isAIModalOpen}
+                onClose={() => setIsAIModalOpen(false)}
+                currentContent={localContent}
+                sectionType="introduction"
+                onAccept={handleAIAccept}
+                title="Improve Professional Profile"
+            />
 
             {/* Custom Styles for Quill Editor */}
             <style>{`

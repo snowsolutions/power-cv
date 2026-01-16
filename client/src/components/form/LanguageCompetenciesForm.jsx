@@ -7,7 +7,7 @@ import {
 } from "../../utils/constants";
 import { getEmptyLanguageItem } from "../../utils/initialCVData";
 
-const LanguageItem = ({ language, onUpdate, onRemove }) => {
+const LanguageItem = ({ language, onUpdate, onRemove, showLevel }) => {
     const [isExpanded, setIsExpanded] = useState(false);
 
     const handleFieldChange = (field, value) => {
@@ -22,7 +22,7 @@ const LanguageItem = ({ language, onUpdate, onRemove }) => {
                     <h4 className="font-medium text-gray-900">
                         {language.language || "Untitled Language"}
                     </h4>
-                    {language.proficiency && (
+                    {showLevel && language.proficiency && (
                         <span className="inline-block mt-1 px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800">
                             {language.proficiency}
                         </span>
@@ -91,6 +91,7 @@ LanguageItem.propTypes = {
     }).isRequired,
     onUpdate: PropTypes.func.isRequired,
     onRemove: PropTypes.func.isRequired,
+    showLevel: PropTypes.bool.isRequired,
 };
 
 const LanguageCompetenciesForm = ({
@@ -99,6 +100,7 @@ const LanguageCompetenciesForm = ({
     onUpdateItem,
     onRemoveItem,
     onUpdateSectionTitle,
+    onUpdateShowLevel,
 }) => {
     const handleAddLanguage = () => {
         const newLanguage = getEmptyLanguageItem();
@@ -113,6 +115,13 @@ const LanguageCompetenciesForm = ({
         onRemoveItem("languageCompetencies", itemId);
     };
 
+    const handleToggleShowLevel = () => {
+        onUpdateShowLevel(
+            "languageCompetencies",
+            !languageCompetencies.showLevel,
+        );
+    };
+
     return (
         <div className="bg-white rounded-lg shadow-md p-6">
             {/* Section Title */}
@@ -125,6 +134,40 @@ const LanguageCompetenciesForm = ({
             <p className="text-sm text-gray-500 -mt-4 mb-6">
                 List the languages you speak and your proficiency level
             </p>
+
+            {/* Show Level Toggle */}
+            <div className="mb-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                <div className="flex items-center justify-between">
+                    <div>
+                        <label className="text-sm font-medium text-gray-700">
+                            Show Proficiency Levels
+                        </label>
+                        <p className="text-xs text-gray-500 mt-1">
+                            Display proficiency level next to each language in
+                            the CV
+                        </p>
+                    </div>
+                    <button
+                        type="button"
+                        onClick={handleToggleShowLevel}
+                        className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
+                            languageCompetencies.showLevel
+                                ? "bg-blue-600"
+                                : "bg-gray-200"
+                        }`}
+                        role="switch"
+                        aria-checked={languageCompetencies.showLevel}
+                    >
+                        <span
+                            className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
+                                languageCompetencies.showLevel
+                                    ? "translate-x-5"
+                                    : "translate-x-0"
+                            }`}
+                        />
+                    </button>
+                </div>
+            </div>
 
             {/* Languages List */}
             <div className="mb-6">
@@ -148,6 +191,7 @@ const LanguageCompetenciesForm = ({
                                 language={language}
                                 onUpdate={handleUpdateLanguage}
                                 onRemove={handleRemoveLanguage}
+                                showLevel={languageCompetencies.showLevel}
                             />
                         ))}
                         <button
@@ -208,6 +252,7 @@ const LanguageCompetenciesForm = ({
 LanguageCompetenciesForm.propTypes = {
     languageCompetencies: PropTypes.shape({
         sectionTitle: PropTypes.string.isRequired,
+        showLevel: PropTypes.bool,
         items: PropTypes.arrayOf(
             PropTypes.shape({
                 id: PropTypes.string.isRequired,
@@ -220,6 +265,7 @@ LanguageCompetenciesForm.propTypes = {
     onUpdateItem: PropTypes.func.isRequired,
     onRemoveItem: PropTypes.func.isRequired,
     onUpdateSectionTitle: PropTypes.func.isRequired,
+    onUpdateShowLevel: PropTypes.func.isRequired,
 };
 
 export default LanguageCompetenciesForm;

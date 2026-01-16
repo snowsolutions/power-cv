@@ -80,6 +80,23 @@ const useCVStore = create(
                     isDirty: true,
                 })),
 
+            // Actions for Show Level Toggle (skills, languages)
+            updateShowLevel: (section, showLevel) =>
+                set((state) => ({
+                    currentCV: {
+                        ...state.currentCV,
+                        data: {
+                            ...state.currentCV.data,
+                            [section]: {
+                                ...state.currentCV.data[section],
+                                showLevel: showLevel,
+                            },
+                        },
+                        updatedAt: new Date().toISOString(),
+                    },
+                    isDirty: true,
+                })),
+
             // Actions for List Items (work history, certifications, etc.)
             addItem: (section, item) =>
                 set((state) => ({

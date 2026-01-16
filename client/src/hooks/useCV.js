@@ -17,6 +17,7 @@ export const useCV = () => {
     const updatePersonalInfo = useCVStore((state) => state.updatePersonalInfo);
     const updateIntroduction = useCVStore((state) => state.updateIntroduction);
     const updateSectionTitle = useCVStore((state) => state.updateSectionTitle);
+    const updateShowLevel = useCVStore((state) => state.updateShowLevel);
     const addItem = useCVStore((state) => state.addItem);
     const updateItem = useCVStore((state) => state.updateItem);
     const removeItem = useCVStore((state) => state.removeItem);
@@ -66,6 +67,7 @@ export const useCV = () => {
         updatePersonalInfo,
         updateIntroduction,
         updateSectionTitle,
+        updateShowLevel,
         addItem,
         updateItem,
         removeItem,

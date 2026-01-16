@@ -76,3 +76,28 @@ export const HTTP_STATUS = {
     NOT_FOUND: 404,
     INTERNAL_SERVER_ERROR: 500,
 };
+
+/**
+ * Sort work history items by date (latest first)
+ * @param {Array} items - Array of work history items
+ * @returns {Array} Sorted array (latest job first)
+ */
+export const sortWorkHistoryByDate = (items) => {
+    if (!items || !Array.isArray(items)) return [];
+
+    return [...items].sort((a, b) => {
+        // Handle "Present" or empty dateTo (currently working)
+        const dateToA = a.dateTo || "9999-12"; // Future date for current jobs
+        const dateToB = b.dateTo || "9999-12";
+
+        // First, compare end dates (descending - latest first)
+        if (dateToB !== dateToA) {
+            return dateToB.localeCompare(dateToA);
+        }
+
+        // If end dates are the same, compare start dates (descending)
+        const dateFromA = a.dateFrom || "";
+        const dateFromB = b.dateFrom || "";
+        return dateFromB.localeCompare(dateFromA);
+    });
+};

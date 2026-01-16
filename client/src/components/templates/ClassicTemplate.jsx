@@ -1,6 +1,7 @@
 import { memo, useEffect, useRef, useState } from "react";
 import PropTypes from "prop-types";
 import { FormattedDescription } from "../common";
+import { sortWorkHistoryByDate } from "../../utils/constants";
 
 /**
  * Classic CV Template - Traditional single-column layout with intelligent page breaks
@@ -51,9 +52,20 @@ const ClassicTemplate = memo(({ data, currentPage = 1, onPageCountChange }) => {
 
             // Select only elements that have stable IDs.
             // These IDs must be consistent between the logic loop and the JSX render.
-            const allItems = Array.from(contentRef.current.querySelectorAll("[id]"))
-                .filter(el => !el.classList.contains('sliding-content') && !el.classList.contains('page-viewport'))
-                .sort((a, b) => a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING ? -1 : 1);
+            const allItems = Array.from(
+                contentRef.current.querySelectorAll("[id]"),
+            )
+                .filter(
+                    (el) =>
+                        !el.classList.contains("sliding-content") &&
+                        !el.classList.contains("page-viewport"),
+                )
+                .sort((a, b) =>
+                    a.compareDocumentPosition(b) &
+                    Node.DOCUMENT_POSITION_FOLLOWING
+                        ? -1
+                        : 1,
+                );
 
             const newMargins = {};
 
@@ -68,9 +80,19 @@ const ClassicTemplate = memo(({ data, currentPage = 1, onPageCountChange }) => {
                 const pageNum = Math.floor(itemTop / A4_HEIGHT_PX) + 1;
                 const pageBottom = pageNum * A4_HEIGHT_PX;
 
-                const isH2 = item.tagName === "H2" || item.classList.contains("section-title");
-                const isHeader = isH2 || item.tagName === "H3" || item.classList.contains("job-title") || item.classList.contains("job-header");
-                const isUnit = item.classList.contains("page-item") || item.classList.contains("avoid-page-break") || item.tagName === "LI" || item.tagName === "P";
+                const isH2 =
+                    item.tagName === "H2" ||
+                    item.classList.contains("section-title");
+                const isHeader =
+                    isH2 ||
+                    item.tagName === "H3" ||
+                    item.classList.contains("job-title") ||
+                    item.classList.contains("job-header");
+                const isUnit =
+                    item.classList.contains("page-item") ||
+                    item.classList.contains("avoid-page-break") ||
+                    item.tagName === "LI" ||
+                    item.tagName === "P";
 
                 const spaceAtBottom = pageBottom - itemTop;
 
@@ -84,7 +106,8 @@ const ClassicTemplate = memo(({ data, currentPage = 1, onPageCountChange }) => {
                     if (spaceAtBottom < 80) shouldPush = true;
                 } else if (isUnit) {
                     // Small items that shouldn't be cut.
-                    if (itemTop + itemHeight > pageBottom - 5) shouldPush = true;
+                    if (itemTop + itemHeight > pageBottom - 5)
+                        shouldPush = true;
                 }
 
                 if (shouldPush) {
@@ -112,8 +135,8 @@ const ClassicTemplate = memo(({ data, currentPage = 1, onPageCountChange }) => {
     const SectionTitle = ({ title, id }) => (
         <h2
             id={id}
-            style={{ marginTop: pageMargins[id] ? `${pageMargins[id]}px` : '' }}
-            className={`text-base font-bold text-gray-900 mb-2 pb-1 border-b-2 border-gray-800 uppercase tracking-wide section-title ${pageMargins[id] ? 'force-page-break' : ''}`}
+            style={{ marginTop: pageMargins[id] ? `${pageMargins[id]}px` : "" }}
+            className={`text-base font-bold text-gray-900 mb-2 pb-1 border-b-2 border-gray-800 uppercase tracking-wide section-title ${pageMargins[id] ? "force-page-break" : ""}`}
         >
             {title}
         </h2>
@@ -124,7 +147,7 @@ const ClassicTemplate = memo(({ data, currentPage = 1, onPageCountChange }) => {
             {/* Page viewport - shows only one page at a time */}
             <div
                 className="page-viewport overflow-hidden relative bg-white shadow-lg rounded-lg print:shadow-none print:rounded-none"
-                style={{ height: '1123px' }}
+                style={{ height: "1123px" }}
             >
                 {/* Sliding content wrapper */}
                 <div
@@ -182,7 +205,10 @@ const ClassicTemplate = memo(({ data, currentPage = 1, onPageCountChange }) => {
                         {hasContent(introduction) && (
                             <section className="mb-6 page-section avoid-page-break">
                                 <SectionTitle
-                                    title={introduction.sectionTitle || "Professional Summary"}
+                                    title={
+                                        introduction.sectionTitle ||
+                                        "Professional Summary"
+                                    }
                                     id="intro-title"
                                 />
                                 <FormattedDescription
@@ -194,56 +220,42 @@ const ClassicTemplate = memo(({ data, currentPage = 1, onPageCountChange }) => {
                             </section>
                         )}
 
-                        {/* Professional Skills Section */}
-                        {hasContent(professionalSkills) && (
-                            <section className="mb-6 page-section avoid-page-break">
-                                <SectionTitle
-                                    title={professionalSkills.sectionTitle || "Professional Skills"}
-                                    id="skills-title"
-                                />
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                    {professionalSkills.items.map((skill) => (
-                                        <div
-                                            key={skill.id}
-                                            className="flex items-start gap-2"
-                                        >
-                                            <span className="text-gray-800 font-medium">
-                                                •
-                                            </span>
-                                            <div className="flex-grow">
-                                                <span className="text-gray-800 font-semibold text-xs">
-                                                    {skill.skillName}
-                                                </span>
-                                                {skill.level && (
-                                                    <span className="text-gray-600 text-xs ml-2">
-                                                        ({skill.level})
-                                                    </span>
-                                                )}
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            </section>
-                        )}
-
                         {/* Work History Section */}
                         {hasContent(workHistory) && (
                             <section className="mb-6 page-section">
                                 <SectionTitle
-                                    title={workHistory.sectionTitle || "Professional Experience"}
+                                    title={
+                                        workHistory.sectionTitle ||
+                                        "Professional Experience"
+                                    }
                                     id="work-title"
                                 />
                                 <div className="space-y-5">
-                                    {workHistory.items.map((work, idx) => (
+                                    {sortWorkHistoryByDate(
+                                        workHistory.items,
+                                    ).map((work, idx) => (
                                         <div
+                                            key={work.id}
                                             id={`work-item-${idx}`}
-                                            style={{ marginTop: pageMargins[`work-item-${idx}`] ? `${pageMargins[`work-item-${idx}`]}px` : '' }}
-                                            className={`page-item pb-3 avoid-page-break ${pageMargins[`work-item-${idx}`] ? 'force-page-break' : ''}`}
+                                            style={{
+                                                marginTop: pageMargins[
+                                                    `work-item-${idx}`
+                                                ]
+                                                    ? `${pageMargins[`work-item-${idx}`]}px`
+                                                    : "",
+                                            }}
+                                            className={`page-item pb-3 avoid-page-break ${pageMargins[`work-item-${idx}`] ? "force-page-break" : ""}`}
                                         >
                                             <div
                                                 id={`work-header-${idx}`}
-                                                style={{ marginTop: pageMargins[`work-header-${idx}`] ? `${pageMargins[`work-header-${idx}`]}px` : '' }}
-                                                className={`flex justify-between items-start mb-1 job-header ${pageMargins[`work-header-${idx}`] ? 'force-page-break' : ''}`}
+                                                style={{
+                                                    marginTop: pageMargins[
+                                                        `work-header-${idx}`
+                                                    ]
+                                                        ? `${pageMargins[`work-header-${idx}`]}px`
+                                                        : "",
+                                                }}
+                                                className={`flex justify-between items-start mb-1 job-header ${pageMargins[`work-header-${idx}`] ? "force-page-break" : ""}`}
                                             >
                                                 <div className="flex-grow">
                                                     <h3 className="text-sm font-bold text-gray-900 job-title">
@@ -275,11 +287,50 @@ const ClassicTemplate = memo(({ data, currentPage = 1, onPageCountChange }) => {
                             </section>
                         )}
 
+                        {/* Professional Skills Section */}
+                        {hasContent(professionalSkills) && (
+                            <section className="mb-6 page-section avoid-page-break">
+                                <SectionTitle
+                                    title={
+                                        professionalSkills.sectionTitle ||
+                                        "Professional Skills"
+                                    }
+                                    id="skills-title"
+                                />
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                    {professionalSkills.items.map((skill) => (
+                                        <div
+                                            key={skill.id}
+                                            className="flex items-start gap-2"
+                                        >
+                                            <span className="text-gray-800 font-medium">
+                                                •
+                                            </span>
+                                            <div className="flex-grow">
+                                                <span className="text-gray-800 font-semibold text-xs">
+                                                    {skill.skillName}
+                                                </span>
+                                                {professionalSkills.showLevel !==
+                                                    false &&
+                                                    skill.level && (
+                                                        <span className="text-gray-600 text-xs ml-2">
+                                                            ({skill.level})
+                                                        </span>
+                                                    )}
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </section>
+                        )}
+
                         {/* Education Section */}
                         {hasContent(educations) && (
                             <section className="mb-6 page-section">
                                 <SectionTitle
-                                    title={educations.sectionTitle || "Education"}
+                                    title={
+                                        educations.sectionTitle || "Education"
+                                    }
                                     id="edu-title"
                                 />
                                 <div className="space-y-4">
@@ -287,8 +338,14 @@ const ClassicTemplate = memo(({ data, currentPage = 1, onPageCountChange }) => {
                                         <div
                                             key={edu.id}
                                             id={`edu-item-${idx}`}
-                                            style={{ marginTop: pageMargins[`edu-item-${idx}`] ? `${pageMargins[`edu-item-${idx}`]}px` : '' }}
-                                            className={`page-item pb-2 avoid-page-break ${pageMargins[`edu-item-${idx}`] ? 'force-page-break' : ''}`}
+                                            style={{
+                                                marginTop: pageMargins[
+                                                    `edu-item-${idx}`
+                                                ]
+                                                    ? `${pageMargins[`edu-item-${idx}`]}px`
+                                                    : "",
+                                            }}
+                                            className={`page-item pb-2 avoid-page-break ${pageMargins[`edu-item-${idx}`] ? "force-page-break" : ""}`}
                                         >
                                             <div className="flex justify-between items-start">
                                                 <div className="flex-grow">
@@ -317,7 +374,10 @@ const ClassicTemplate = memo(({ data, currentPage = 1, onPageCountChange }) => {
                         {hasContent(certifications) && (
                             <section className="mb-6 page-section">
                                 <SectionTitle
-                                    title={certifications.sectionTitle || "Certifications"}
+                                    title={
+                                        certifications.sectionTitle ||
+                                        "Certifications"
+                                    }
                                     id="cert-title"
                                 />
                                 <div className="space-y-4">
@@ -325,8 +385,14 @@ const ClassicTemplate = memo(({ data, currentPage = 1, onPageCountChange }) => {
                                         <div
                                             key={cert.id}
                                             id={`cert-item-${idx}`}
-                                            style={{ marginTop: pageMargins[`cert-item-${idx}`] ? `${pageMargins[`cert-item-${idx}`]}px` : '' }}
-                                            className={`flex items-start gap-2 page-item pb-2 avoid-page-break ${pageMargins[`cert-item-${idx}`] ? 'force-page-break' : ''}`}
+                                            style={{
+                                                marginTop: pageMargins[
+                                                    `cert-item-${idx}`
+                                                ]
+                                                    ? `${pageMargins[`cert-item-${idx}`]}px`
+                                                    : "",
+                                            }}
+                                            className={`flex items-start gap-2 page-item pb-2 avoid-page-break ${pageMargins[`cert-item-${idx}`] ? "force-page-break" : ""}`}
                                         >
                                             <span className="text-gray-800 font-medium mt-1">
                                                 •
@@ -368,7 +434,10 @@ const ClassicTemplate = memo(({ data, currentPage = 1, onPageCountChange }) => {
                         {hasContent(activities) && (
                             <section className="mb-6 page-section">
                                 <SectionTitle
-                                    title={activities.sectionTitle || "Activities & Achievements"}
+                                    title={
+                                        activities.sectionTitle ||
+                                        "Activities & Achievements"
+                                    }
                                     id="activities-title"
                                 />
                                 <div className="space-y-4">
@@ -376,8 +445,14 @@ const ClassicTemplate = memo(({ data, currentPage = 1, onPageCountChange }) => {
                                         <div
                                             key={activity.id}
                                             id={`activity-item-${idx}`}
-                                            style={{ marginTop: pageMargins[`activity-item-${idx}`] ? `${pageMargins[`activity-item-${idx}`]}px` : '' }}
-                                            className={`page-item pb-3 avoid-page-break ${pageMargins[`activity-item-${idx}`] ? 'force-page-break' : ''}`}
+                                            style={{
+                                                marginTop: pageMargins[
+                                                    `activity-item-${idx}`
+                                                ]
+                                                    ? `${pageMargins[`activity-item-${idx}`]}px`
+                                                    : "",
+                                            }}
+                                            className={`page-item pb-3 avoid-page-break ${pageMargins[`activity-item-${idx}`] ? "force-page-break" : ""}`}
                                         >
                                             <div className="flex justify-between items-start mb-1">
                                                 <h3 className="text-sm font-bold text-gray-900 flex-grow">
@@ -407,7 +482,10 @@ const ClassicTemplate = memo(({ data, currentPage = 1, onPageCountChange }) => {
                         {hasContent(languageCompetencies) && (
                             <section className="mb-6 page-section avoid-page-break">
                                 <SectionTitle
-                                    title={languageCompetencies.sectionTitle || "Languages"}
+                                    title={
+                                        languageCompetencies.sectionTitle ||
+                                        "Languages"
+                                    }
                                     id="lang-title"
                                 />
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -423,11 +501,13 @@ const ClassicTemplate = memo(({ data, currentPage = 1, onPageCountChange }) => {
                                                 <span className="text-gray-800 font-semibold text-xs">
                                                     {lang.language}
                                                 </span>
-                                                {lang.proficiency && (
-                                                    <span className="text-gray-600 text-xs ml-2">
-                                                        ({lang.proficiency})
-                                                    </span>
-                                                )}
+                                                {languageCompetencies.showLevel !==
+                                                    false &&
+                                                    lang.proficiency && (
+                                                        <span className="text-gray-600 text-xs ml-2">
+                                                            ({lang.proficiency})
+                                                        </span>
+                                                    )}
                                             </div>
                                         </div>
                                     ))}

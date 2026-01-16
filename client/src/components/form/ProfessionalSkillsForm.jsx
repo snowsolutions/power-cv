@@ -4,7 +4,7 @@ import { Input, SectionTitleEditor } from "../common";
 import { DEFAULT_SECTION_TITLES, SKILL_LEVELS } from "../../utils/constants";
 import { getEmptySkillItem } from "../../utils/initialCVData";
 
-const SkillItem = ({ skill, onUpdate, onRemove }) => {
+const SkillItem = ({ skill, onUpdate, onRemove, showLevel }) => {
     const [isExpanded, setIsExpanded] = useState(false);
 
     const handleFieldChange = (field, value) => {
@@ -19,7 +19,7 @@ const SkillItem = ({ skill, onUpdate, onRemove }) => {
                     <h4 className="font-medium text-gray-900">
                         {skill.skillName || "Untitled Skill"}
                     </h4>
-                    {skill.level && (
+                    {showLevel && skill.level && (
                         <span className="inline-block mt-1 px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800">
                             {skill.level}
                         </span>
@@ -103,6 +103,7 @@ SkillItem.propTypes = {
     }).isRequired,
     onUpdate: PropTypes.func.isRequired,
     onRemove: PropTypes.func.isRequired,
+    showLevel: PropTypes.bool.isRequired,
 };
 
 const ProfessionalSkillsForm = ({
@@ -111,6 +112,7 @@ const ProfessionalSkillsForm = ({
     onUpdateItem,
     onRemoveItem,
     onUpdateSectionTitle,
+    onUpdateShowLevel,
 }) => {
     const handleAddSkill = () => {
         const newSkill = getEmptySkillItem();
@@ -123,6 +125,10 @@ const ProfessionalSkillsForm = ({
 
     const handleRemoveSkill = (itemId) => {
         onRemoveItem("professionalSkills", itemId);
+    };
+
+    const handleToggleShowLevel = () => {
+        onUpdateShowLevel("professionalSkills", !professionalSkills.showLevel);
     };
 
     return (
@@ -138,6 +144,40 @@ const ProfessionalSkillsForm = ({
                 List your professional skills, technical abilities, and
                 competencies
             </p>
+
+            {/* Show Level Toggle */}
+            <div className="mb-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                <div className="flex items-center justify-between">
+                    <div>
+                        <label className="text-sm font-medium text-gray-700">
+                            Show Skill Levels
+                        </label>
+                        <p className="text-xs text-gray-500 mt-1">
+                            Display proficiency level next to each skill in the
+                            CV
+                        </p>
+                    </div>
+                    <button
+                        type="button"
+                        onClick={handleToggleShowLevel}
+                        className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
+                            professionalSkills.showLevel
+                                ? "bg-blue-600"
+                                : "bg-gray-200"
+                        }`}
+                        role="switch"
+                        aria-checked={professionalSkills.showLevel}
+                    >
+                        <span
+                            className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
+                                professionalSkills.showLevel
+                                    ? "translate-x-5"
+                                    : "translate-x-0"
+                            }`}
+                        />
+                    </button>
+                </div>
+            </div>
 
             {/* Skills List */}
             <div className="mb-6">
@@ -161,6 +201,7 @@ const ProfessionalSkillsForm = ({
                                 skill={skill}
                                 onUpdate={handleUpdateSkill}
                                 onRemove={handleRemoveSkill}
+                                showLevel={professionalSkills.showLevel}
                             />
                         ))}
                         <button
@@ -196,7 +237,9 @@ const ProfessionalSkillsForm = ({
                                 Add context in the description (years of
                                 experience, projects)
                             </li>
-                            <li>Prioritize skills most relevant to your goals</li>
+                            <li>
+                                Prioritize skills most relevant to your goals
+                            </li>
                         </ul>
                     </div>
                 </div>
@@ -208,19 +251,21 @@ const ProfessionalSkillsForm = ({
 ProfessionalSkillsForm.propTypes = {
     professionalSkills: PropTypes.shape({
         sectionTitle: PropTypes.string.isRequired,
+        showLevel: PropTypes.bool,
         items: PropTypes.arrayOf(
             PropTypes.shape({
                 id: PropTypes.string.isRequired,
                 skillName: PropTypes.string.isRequired,
                 level: PropTypes.string.isRequired,
                 description: PropTypes.string.isRequired,
-            })
+            }),
         ).isRequired,
     }).isRequired,
     onAddItem: PropTypes.func.isRequired,
     onUpdateItem: PropTypes.func.isRequired,
     onRemoveItem: PropTypes.func.isRequired,
     onUpdateSectionTitle: PropTypes.func.isRequired,
+    onUpdateShowLevel: PropTypes.func.isRequired,
 };
 
 export default ProfessionalSkillsForm;

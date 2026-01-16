@@ -165,6 +165,29 @@ export const importCVFromFile = (file) => {
                 // Extract CV data
                 const cv = parseResult.data.cv;
 
+                // Ensure backward compatibility for showLevel field
+                const normalizedData = { ...cv.data };
+                if (normalizedData.professionalSkills) {
+                    normalizedData.professionalSkills = {
+                        ...normalizedData.professionalSkills,
+                        showLevel:
+                            normalizedData.professionalSkills.showLevel !==
+                            undefined
+                                ? normalizedData.professionalSkills.showLevel
+                                : true,
+                    };
+                }
+                if (normalizedData.languageCompetencies) {
+                    normalizedData.languageCompetencies = {
+                        ...normalizedData.languageCompetencies,
+                        showLevel:
+                            normalizedData.languageCompetencies.showLevel !==
+                            undefined
+                                ? normalizedData.languageCompetencies.showLevel
+                                : true,
+                    };
+                }
+
                 // Success
                 resolve({
                     success: true,
@@ -172,7 +195,7 @@ export const importCVFromFile = (file) => {
                         id: null, // Clear ID for imported CV (will be new)
                         name: cv.name,
                         template: cv.template,
-                        data: cv.data,
+                        data: normalizedData,
                         createdAt: null, // Will be set on save
                         updatedAt: null,
                     },
@@ -229,13 +252,34 @@ export const importCVFromString = (jsonString) => {
         // Extract CV data
         const cv = parseResult.data.cv;
 
+        // Ensure backward compatibility for showLevel field
+        const normalizedData = { ...cv.data };
+        if (normalizedData.professionalSkills) {
+            normalizedData.professionalSkills = {
+                ...normalizedData.professionalSkills,
+                showLevel:
+                    normalizedData.professionalSkills.showLevel !== undefined
+                        ? normalizedData.professionalSkills.showLevel
+                        : true,
+            };
+        }
+        if (normalizedData.languageCompetencies) {
+            normalizedData.languageCompetencies = {
+                ...normalizedData.languageCompetencies,
+                showLevel:
+                    normalizedData.languageCompetencies.showLevel !== undefined
+                        ? normalizedData.languageCompetencies.showLevel
+                        : true,
+            };
+        }
+
         return {
             success: true,
             cv: {
                 id: null,
                 name: cv.name,
                 template: cv.template,
-                data: cv.data,
+                data: normalizedData,
                 createdAt: null,
                 updatedAt: null,
             },

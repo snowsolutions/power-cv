@@ -10,3 +10,5 @@ export { default as Loader } from "./Loader";
 export { default as SectionTitleEditor } from "./SectionTitleEditor";
 export { default as ValidatedInput } from "./ValidatedInput";
 export { default as FormattedDescription } from "./FormattedDescription";
+export { default as AIButton } from "./AIButton";
+export { default as AIImproveModal } from "./AIImproveModal";

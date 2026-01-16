@@ -118,6 +118,68 @@
         @apply text-sm text-gray-500 mt-1;
     }
 
+    /* HTML Formatted Description Styles for CV Templates */
+    .formatted-html {
+        @apply text-inherit;
+    }
+
+    .formatted-html p {
+        @apply mb-2 last:mb-0;
+    }
+
+    .formatted-html ul {
+        @apply list-disc list-inside space-y-1 my-2;
+    }
+
+    .formatted-html ol {
+        @apply list-decimal list-inside space-y-1 my-2;
+    }
+
+    .formatted-html li {
+        @apply text-inherit;
+    }
+
+    .formatted-html strong,
+    .formatted-html b {
+        @apply font-semibold;
+    }
+
+    .formatted-html em,
+    .formatted-html i {
+        @apply italic;
+    }
+
+    .formatted-html u {
+        @apply underline;
+    }
+
+    .formatted-html s,
+    .formatted-html strike {
+        @apply line-through;
+    }
+
+    .formatted-html a {
+        @apply text-blue-600 underline;
+    }
+
+    .formatted-html h1,
+    .formatted-html h2,
+    .formatted-html h3,
+    .formatted-html h4,
+    .formatted-html h5,
+    .formatted-html h6 {
+        @apply font-semibold mb-1;
+    }
+
+    .formatted-html blockquote {
+        @apply border-l-2 border-gray-300 pl-3 italic my-2;
+    }
+
+    .formatted-html pre,
+    .formatted-html code {
+        @apply font-mono text-sm bg-gray-100 rounded px-1;
+    }
+
     /* Page Container */
     .page-container {
         @apply min-h-screen p-6 md:p-8;
@@ -343,6 +405,18 @@
     .formatted-description,
     .formatted-description ul,
     .formatted-description li {
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+    }
+
+    /* HTML formatted content styles */
+    .formatted-html ul,
+    .formatted-html ol {
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+    }
+
+    .formatted-html li {
         page-break-inside: avoid !important;
         break-inside: avoid !important;
     }
