@@ -39,6 +39,7 @@ const ClassicTemplate = memo(({ data, currentPage = 1, onPageCountChange }) => {
             const viewport = contentRef.current.closest(".page-viewport");
             const A4_HEIGHT_PX = viewport ? viewport.offsetHeight : 1122.51;
             const BUFFER = 20; // Buffer to prevent cutting content at page bottom
+            const HEADER_MIN_SPACE = 200; // Minimum space needed after a header before page break
 
             // Get the scale factor (due to zoom) to normalize coordinates
             const rootRect = contentRef.current.getBoundingClientRect();
@@ -115,27 +116,55 @@ const ClassicTemplate = memo(({ data, currentPage = 1, onPageCountChange }) => {
                 const isHeader =
                     item.tagName === "H2" ||
                     item.tagName === "H3" ||
-                    item.classList.contains("job-title");
+                    item.classList.contains("job-title") ||
+                    item.classList.contains("section-title");
                 const isAvoidBreak =
                     item.classList.contains("avoid-page-break") ||
                     item.classList.contains("page-item");
 
-                // If item crosses page boundary
-                if (
-                    itemTop < pageBottom - BUFFER &&
-                    itemBottom > pageBottom - BUFFER
-                ) {
-                    const spaceLeft = pageBottom - itemTop;
+                // Check if this is a parent container with headers inside
+                const hasHeaderChild =
+                    item.querySelector("h2") ||
+                    item.querySelector("h3") ||
+                    item.querySelector(".job-title");
 
+                const spaceLeft = pageBottom - itemTop;
+                const spaceAfter = pageBottom - itemBottom;
+
+                // Check if item crosses page boundary OR if it's a header too close to page bottom
+                const crossesPageBoundary =
+                    itemTop < pageBottom - BUFFER &&
+                    itemBottom > pageBottom - BUFFER;
+
+                const headerTooCloseToBottom =
+                    (isHeader || hasHeaderChild) &&
+                    spaceAfter < HEADER_MIN_SPACE &&
+                    spaceAfter > 0;
+
+                const containerWithHeaderNearBottom =
+                    hasHeaderChild && spaceLeft < HEADER_MIN_SPACE;
+
+                if (
+                    crossesPageBoundary ||
+                    headerTooCloseToBottom ||
+                    containerWithHeaderNearBottom
+                ) {
                     // Logic for pushing:
-                    // Always push headers, avoid-break items, or items with very little space left
-                    if (isHeader || isAvoidBreak || spaceLeft < 80) {
+                    // Always push headers, avoid-break items, containers with headers, or items with very little space left
+                    if (
+                        isHeader ||
+                        isAvoidBreak ||
+                        hasHeaderChild ||
+                        spaceLeft < 100 ||
+                        headerTooCloseToBottom ||
+                        containerWithHeaderNearBottom
+                    ) {
                         const pushDistance = pageBottom - itemTop;
                         item.style.marginTop = `${pushDistance}px`;
                         item.classList.add("force-page-break");
 
                         console.log(
-                            `[PageBreak] Pushing item ${index} ("${item.textContent?.substring(0, 15)}...") by ${pushDistance.toFixed(1)}px`,
+                            `[PageBreak] Pushing item ${index} ("${item.textContent?.substring(0, 30)}...") by ${pushDistance.toFixed(1)}px (reasons: header=${isHeader}, hasChild=${hasHeaderChild}, nearBottom=${headerTooCloseToBottom}, container=${containerWithHeaderNearBottom})`,
                         );
                     }
                 }
