@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import { ClipboardCheck, RefreshCw, AlertCircle } from "lucide-react";
 import { Loader } from "../components/common";
 
 function TaskStatus() {
@@ -50,20 +51,20 @@ function TaskStatus() {
 
     if (error) {
         return (
-            <div className="min-h-screen bg-gray-50 p-8">
-                <div className="max-w-4xl mx-auto">
-                    <div className="alert alert-danger">
-                        <h2 className="text-xl font-bold mb-2">
-                            Error Loading Task Status
-                        </h2>
-                        <p>{error}</p>
-                        <button
-                            onClick={fetchMarkdown}
-                            className="btn btn-primary mt-4"
-                        >
-                            Retry
-                        </button>
-                    </div>
+            <div className="min-h-screen bg-gray-50 p-8 flex items-center justify-center">
+                <div className="max-w-md w-full bg-white p-8 rounded-2xl shadow-lg border border-red-100 text-center">
+                    <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
+                    <h2 className="text-2xl font-bold text-gray-900 mb-2">
+                        Error Loading Status
+                    </h2>
+                    <p className="text-gray-600 mb-6">{error}</p>
+                    <button
+                        onClick={fetchMarkdown}
+                        className="flex items-center justify-center gap-2 w-full px-6 py-3 bg-red-600 text-white rounded-xl hover:bg-red-700 transition-all font-bold shadow-lg shadow-red-100"
+                    >
+                        <RefreshCw className="w-5 h-5" />
+                        Retry Connection
+                    </button>
                 </div>
             </div>
         );
@@ -73,20 +74,26 @@ function TaskStatus() {
         <div className="min-h-screen bg-gray-50 py-8">
             <div className="max-w-6xl mx-auto px-4">
                 {/* Header */}
-                <div className="mb-6 flex justify-between items-center">
-                    <div>
-                        <h1 className="text-3xl font-bold text-gray-900 mb-2">
-                            📋 Task Management & Progress
-                        </h1>
-                        <p className="text-gray-600">
-                            Real-time project status and task tracking
-                        </p>
+                <div className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div className="flex items-center gap-4">
+                        <div className="bg-purple-600 p-3 rounded-2xl shadow-lg shadow-purple-100">
+                            <ClipboardCheck className="w-8 h-8 text-white" />
+                        </div>
+                        <div>
+                            <h1 className="text-3xl font-bold text-gray-900">
+                                Task Management
+                            </h1>
+                            <p className="text-gray-500 font-medium">
+                                Real-time project status and tracking
+                            </p>
+                        </div>
                     </div>
                     <button
                         onClick={fetchMarkdown}
-                        className="btn btn-secondary"
+                        className="flex items-center justify-center gap-2 px-6 py-2 bg-white text-gray-700 border border-gray-200 rounded-xl hover:bg-gray-50 transition-all shadow-sm font-semibold"
                     >
-                        🔄 Refresh
+                        <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+                        Refresh Status
                     </button>
                 </div>
 

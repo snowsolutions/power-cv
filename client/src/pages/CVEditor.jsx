@@ -1,5 +1,17 @@
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { useEffect, useState, useRef } from "react";
+import {
+    Save,
+    Download,
+    Upload,
+    FileDown,
+    Plus,
+    Minus,
+    Eye,
+    EyeOff,
+    Home,
+    Loader2
+} from "lucide-react";
 import { useCV } from "../hooks/useCV";
 import {
     PersonalInfoForm,
@@ -163,11 +175,10 @@ function CVEditor() {
                 {saveMessage && (
                     <div className="fixed top-6 right-6 z-30 animate-slide-in">
                         <div
-                            className={`px-4 py-3 rounded-lg shadow-lg ${
-                                saveMessage.type === "success"
+                            className={`px-4 py-3 rounded-lg shadow-lg ${saveMessage.type === "success"
                                     ? "bg-green-100 text-green-800 border border-green-200"
                                     : "bg-red-100 text-red-800 border border-red-200"
-                            }`}
+                                }`}
                         >
                             <p className="font-medium text-sm">
                                 {saveMessage.text}
@@ -191,7 +202,7 @@ function CVEditor() {
                     <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
                         <div className="bg-white rounded-lg p-8 shadow-xl">
                             <div className="flex items-center space-x-4">
-                                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div>
+                                <Loader2 className="animate-spin h-8 w-8 text-purple-600" />
                                 <p className="text-lg font-medium text-gray-900">
                                     Loading...
                                 </p>
@@ -211,16 +222,7 @@ function CVEditor() {
                             title="Save CV"
                         >
                             <div className="w-12 h-12 bg-purple-50 text-purple-600 rounded-xl flex items-center justify-center group-hover:bg-purple-600 group-hover:text-white transition-all shadow-sm">
-                                <svg
-                                    className="w-6 h-6 uppercase font-bold"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    strokeWidth="2.5"
-                                    viewBox="0 0 24 24"
-                                >
-                                    <path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z" />
-                                    <path d="M17 21v-8H7v8M7 3v5h8" />
-                                </svg>
+                                <Save className="w-6 h-6" />
                             </div>
                             <span className="text-[10px] font-bold text-gray-500 uppercase tracking-tighter group-hover:text-purple-600">
                                 Save
@@ -234,15 +236,7 @@ function CVEditor() {
                             title="Export to JSON"
                         >
                             <div className="w-12 h-12 bg-purple-50 text-purple-500 rounded-xl flex items-center justify-center group-hover:bg-purple-500 group-hover:text-white transition-all shadow-sm">
-                                <svg
-                                    className="w-6 h-6"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    strokeWidth="2.5"
-                                    viewBox="0 0 24 24"
-                                >
-                                    <path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                                </svg>
+                                <Download className="w-6 h-6" />
                             </div>
                             <span className="text-[10px] font-bold text-gray-500 uppercase tracking-tighter group-hover:text-purple-500">
                                 Export
@@ -256,15 +250,7 @@ function CVEditor() {
                             title="Import from JSON"
                         >
                             <div className="w-12 h-12 bg-purple-50 text-purple-600 rounded-xl flex items-center justify-center group-hover:bg-purple-600 group-hover:text-white transition-all shadow-sm">
-                                <svg
-                                    className="w-6 h-6"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    strokeWidth="2.5"
-                                    viewBox="0 0 24 24"
-                                >
-                                    <path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
-                                </svg>
+                                <Upload className="w-6 h-6" />
                             </div>
                             <span className="text-[10px] font-bold text-gray-500 uppercase tracking-tighter group-hover:text-purple-600">
                                 Import
@@ -278,15 +264,7 @@ function CVEditor() {
                             title="Export to PDF"
                         >
                             <div className="w-12 h-12 bg-purple-50 text-purple-400 rounded-xl flex items-center justify-center group-hover:bg-purple-400 group-hover:text-white transition-all shadow-sm">
-                                <svg
-                                    className="w-6 h-6"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    strokeWidth="2.5"
-                                    viewBox="0 0 24 24"
-                                >
-                                    <path d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                                </svg>
+                                <FileDown className="w-6 h-6" />
                             </div>
                             <span className="text-[10px] font-bold text-gray-500 uppercase tracking-tighter group-hover:text-purple-400">
                                 PDF
@@ -302,15 +280,7 @@ function CVEditor() {
                                 className="w-8 h-8 flex items-center justify-center bg-purple-50 text-purple-600 rounded-lg hover:bg-purple-200 transition-all shadow-sm"
                                 title="Zoom In"
                             >
-                                <svg
-                                    className="w-5 h-5"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    strokeWidth="2.5"
-                                    viewBox="0 0 24 24"
-                                >
-                                    <path d="M12 4v16m8-8H4" />
-                                </svg>
+                                <Plus className="w-5 h-5" />
                             </button>
                             <button
                                 onClick={handleResetZoom}
@@ -324,15 +294,7 @@ function CVEditor() {
                                 className="w-8 h-8 flex items-center justify-center bg-purple-50 text-purple-600 rounded-lg hover:bg-purple-200 transition-all shadow-sm"
                                 title="Zoom Out"
                             >
-                                <svg
-                                    className="w-5 h-5"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    strokeWidth="2.5"
-                                    viewBox="0 0 24 24"
-                                >
-                                    <path d="M20 12H4" />
-                                </svg>
+                                <Minus className="w-5 h-5" />
                             </button>
                         </div>
 
@@ -351,26 +313,9 @@ function CVEditor() {
                                 className={`w-12 h-12 rounded-xl flex items-center justify-center transition-all shadow-sm ${isPreviewVisible ? "bg-purple-50 text-purple-600 group-hover:bg-purple-600 group-hover:text-white" : "bg-purple-100 text-purple-600 group-hover:bg-purple-800 group-hover:text-white"}`}
                             >
                                 {isPreviewVisible ? (
-                                    <svg
-                                        className="w-6 h-6"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        strokeWidth="2.5"
-                                        viewBox="0 0 24 24"
-                                    >
-                                        <path d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
-                                    </svg>
+                                    <EyeOff className="w-6 h-6" />
                                 ) : (
-                                    <svg
-                                        className="w-6 h-6"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        strokeWidth="2.5"
-                                        viewBox="0 0 24 24"
-                                    >
-                                        <path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                        <path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                    </svg>
+                                    <Eye className="w-6 h-6" />
                                 )}
                             </div>
                             <span className="text-[10px] font-bold text-gray-500 uppercase tracking-tighter group-hover:text-gray-800">
@@ -386,15 +331,7 @@ function CVEditor() {
                             title="Back to Dashboard"
                         >
                             <div className="w-12 h-12 bg-purple-50 text-purple-600 rounded-xl flex items-center justify-center group-hover:bg-purple-800 group-hover:text-white transition-all shadow-sm">
-                                <svg
-                                    className="w-6 h-6"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    strokeWidth="2.5"
-                                    viewBox="0 0 24 24"
-                                >
-                                    <path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-                                </svg>
+                                <Home className="w-6 h-6" />
                             </div>
                             <span className="text-[10px] font-bold text-gray-500 uppercase tracking-tighter group-hover:text-purple-800">
                                 Home

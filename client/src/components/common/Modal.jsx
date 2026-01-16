@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import PropTypes from 'prop-types';
+import { X } from 'lucide-react';
 
 /**
  * Reusable Modal Component
@@ -80,17 +81,7 @@ function Modal({
                                 className="text-gray-400 hover:text-gray-600 transition-colors ml-auto"
                                 aria-label="Close modal"
                             >
-                                <svg
-                                    className="w-6 h-6"
-                                    fill="none"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth="2"
-                                    viewBox="0 0 24 24"
-                                    stroke="currentColor"
-                                >
-                                    <path d="M6 18L18 6M6 6l12 12"></path>
-                                </svg>
+                                <X className="w-6 h-6" />
                             </button>
                         )}
                     </div>

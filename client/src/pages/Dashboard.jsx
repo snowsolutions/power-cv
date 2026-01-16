@@ -1,5 +1,15 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
+import {
+    Plus,
+    Copy,
+    Download,
+    Trash2,
+    Search,
+    ClipboardList,
+    ArrowLeft,
+    Loader2
+} from "lucide-react";
 import { useCV } from "../hooks/useCV";
 import { exportCVAsJSON } from "../utils/jsonExport";
 import cvService from "../services/cvService";
@@ -151,11 +161,10 @@ function Dashboard() {
                 {/* Status Messages */}
                 {statusMessage && (
                     <div
-                        className={`mb-4 p-4 rounded-lg ${
-                            statusMessage.type === "success"
+                        className={`mb-4 p-4 rounded-lg ${statusMessage.type === "success"
                                 ? "bg-green-100 text-green-800 border border-green-200"
                                 : "bg-red-100 text-red-800 border border-red-200"
-                        }`}
+                            }`}
                     >
                         <p className="font-medium">{statusMessage.text}</p>
                     </div>
@@ -177,14 +186,16 @@ function Dashboard() {
                 <div className="mb-6 flex flex-wrap gap-4">
                     <button
                         onClick={handleCreateNew}
-                        className="px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-medium shadow-sm"
+                        className="px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-medium shadow-sm flex items-center gap-2"
                     >
-                        + Create New CV
+                        <Plus className="w-5 h-5" />
+                        Create New CV
                     </button>
                     <Link
                         to="/"
-                        className="px-6 py-3 bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200 transition-colors font-medium"
+                        className="px-6 py-3 bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200 transition-colors font-medium flex items-center gap-2"
                     >
+                        <ArrowLeft className="w-5 h-5" />
                         Back to Home
                     </Link>
                 </div>
@@ -192,13 +203,14 @@ function Dashboard() {
                 {/* Search and Filter */}
                 {!isLoading && savedCVs.length > 0 && (
                     <div className="mb-6 flex flex-wrap gap-4">
-                        <div className="flex-grow max-w-md">
+                        <div className="flex-grow max-w-md relative">
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                             <input
                                 type="text"
                                 placeholder="Search CVs by name..."
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
-                                className="w-full px-4 py-2 border border-purple-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                className="w-full pl-10 pr-4 py-2 border border-purple-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                             />
                         </div>
                         <div>
@@ -234,15 +246,18 @@ function Dashboard() {
                 {/* Loading State */}
                 {isLoading && (
                     <div className="flex justify-center items-center py-12">
-                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
+                        <Loader2 className="animate-spin h-12 w-12 text-purple-600" />
                     </div>
                 )}
 
                 {/* CV List */}
                 {!isLoading && savedCVs.length === 0 && (
                     <div className="bg-white rounded-lg shadow-md p-12 text-center">
+                        <div className="flex justify-center mb-4 text-purple-300">
+                            <ClipboardList className="w-16 h-16" />
+                        </div>
                         <p className="text-2xl text-gray-600 mb-4">
-                            📋 No CVs yet
+                            No CVs yet
                         </p>
                         <p className="text-gray-500 mb-6">
                             Create your first CV to get started!
@@ -260,8 +275,11 @@ function Dashboard() {
                     savedCVs.length > 0 &&
                     filteredCVs.length === 0 && (
                         <div className="bg-white rounded-lg shadow-md p-12 text-center">
+                            <div className="flex justify-center mb-4 text-purple-300">
+                                <Search className="w-16 h-16" />
+                            </div>
                             <p className="text-2xl text-gray-600 mb-4">
-                                🔍 No CVs found
+                                No CVs found
                             </p>
                             <p className="text-gray-500 mb-6">
                                 Try adjusting your search or filter criteria
@@ -313,7 +331,7 @@ function Dashboard() {
                                             className="px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors text-sm font-medium shadow-sm"
                                             title="Duplicate CV"
                                         >
-                                            📋
+                                            <Copy className="w-4 h-4" />
                                         </button>
                                         <button
                                             onClick={() =>
@@ -322,7 +340,7 @@ function Dashboard() {
                                             className="px-4 py-2 bg-purple-400 text-white rounded-lg hover:bg-purple-500 transition-colors text-sm font-medium shadow-sm"
                                             title="Export as JSON"
                                         >
-                                            📥
+                                            <Download className="w-4 h-4" />
                                         </button>
                                         <button
                                             onClick={() =>
@@ -331,7 +349,7 @@ function Dashboard() {
                                             className="px-4 py-2 bg-purple-300 text-white rounded-lg hover:bg-red-600 transition-colors text-sm font-medium shadow-sm"
                                             title="Delete CV"
                                         >
-                                            🗑️
+                                            <Trash2 className="w-4 h-4" />
                                         </button>
                                     </div>
                                 </div>

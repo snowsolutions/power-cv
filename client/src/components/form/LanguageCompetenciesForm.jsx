@@ -1,5 +1,13 @@
 import { useState } from "react";
 import PropTypes from "prop-types";
+import {
+    Trash2,
+    ChevronDown,
+    ChevronUp,
+    Plus,
+    Info,
+    Languages
+} from "lucide-react";
 import { Input, SectionTitleEditor } from "../common";
 import {
     DEFAULT_SECTION_TITLES,
@@ -15,10 +23,10 @@ const LanguageItem = ({ language, onUpdate, onRemove, showLevel }) => {
     };
 
     return (
-        <div className="border border-gray-200 rounded-lg p-4 mb-4 hover:border-blue-300 transition-colors">
+        <div className="border border-gray-200 rounded-lg p-4 mb-4 hover:border-blue-300 transition-colors bg-white">
             {/* Header - Always Visible */}
             <div className="flex items-start justify-between mb-3">
-                <div className="flex-1">
+                <div className="flex-1 cursor-pointer" onClick={() => setIsExpanded(!isExpanded)}>
                     <h4 className="font-medium text-gray-900">
                         {language.language || "Untitled Language"}
                     </h4>
@@ -31,15 +39,17 @@ const LanguageItem = ({ language, onUpdate, onRemove, showLevel }) => {
                 <div className="flex gap-2 ml-4">
                     <button
                         onClick={() => setIsExpanded(!isExpanded)}
-                        className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+                        className="text-blue-600 hover:text-blue-800 p-2 rounded-md hover:bg-blue-50 transition-colors"
+                        title={isExpanded ? "Collapse" : "Expand"}
                     >
-                        {isExpanded ? "Collapse" : "Expand"}
+                        {isExpanded ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
                     </button>
                     <button
                         onClick={() => onRemove(language.id)}
-                        className="text-red-600 hover:text-red-800 text-sm font-medium"
+                        className="text-red-600 hover:text-red-800 p-2 rounded-md hover:bg-red-50 transition-colors"
+                        title="Remove language"
                     >
-                        Remove
+                        <Trash2 className="w-5 h-5" />
                     </button>
                 </div>
             </div>
@@ -150,20 +160,18 @@ const LanguageCompetenciesForm = ({
                     <button
                         type="button"
                         onClick={handleToggleShowLevel}
-                        className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
-                            languageCompetencies.showLevel
+                        className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${languageCompetencies.showLevel
                                 ? "bg-blue-600"
                                 : "bg-gray-200"
-                        }`}
+                            }`}
                         role="switch"
                         aria-checked={languageCompetencies.showLevel}
                     >
                         <span
-                            className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
-                                languageCompetencies.showLevel
+                            className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${languageCompetencies.showLevel
                                     ? "translate-x-5"
                                     : "translate-x-0"
-                            }`}
+                                }`}
                         />
                     </button>
                 </div>
@@ -173,13 +181,15 @@ const LanguageCompetenciesForm = ({
             <div className="mb-6">
                 {languageCompetencies.items.length === 0 ? (
                     <div className="text-center py-8 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
+                        <Languages className="w-12 h-12 mx-auto text-gray-400 mb-4" />
                         <p className="text-gray-500 mb-4">
                             No languages added yet
                         </p>
                         <button
                             onClick={handleAddLanguage}
-                            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+                            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors flex items-center gap-2 mx-auto"
                         >
+                            <Plus className="w-4 h-4" />
                             Add Your First Language
                         </button>
                     </div>
@@ -196,9 +206,10 @@ const LanguageCompetenciesForm = ({
                         ))}
                         <button
                             onClick={handleAddLanguage}
-                            className="w-full px-4 py-2 border-2 border-dashed border-gray-300 text-gray-600 rounded-lg hover:border-blue-500 hover:text-blue-600 transition-colors"
+                            className="w-full px-4 py-3 border-2 border-dashed border-gray-300 text-gray-600 rounded-lg hover:border-blue-500 hover:text-blue-600 transition-colors flex items-center justify-center gap-2 font-medium"
                         >
-                            + Add Another Language
+                            <Plus className="w-5 h-5" />
+                            Add Another Language
                         </button>
                     </>
                 )}
@@ -207,17 +218,7 @@ const LanguageCompetenciesForm = ({
             {/* Info Box */}
             <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-md">
                 <div className="flex items-start">
-                    <svg
-                        className="w-5 h-5 text-blue-600 mt-0.5 mr-2 flex-shrink-0"
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
-                    >
-                        <path
-                            fillRule="evenodd"
-                            d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
-                            clipRule="evenodd"
-                        />
-                    </svg>
+                    <Info className="w-5 h-5 text-blue-600 mt-0.5 mr-2 flex-shrink-0" />
                     <div className="text-sm text-blue-800">
                         <p className="font-medium">Proficiency Levels:</p>
                         <ul className="mt-1 list-disc list-inside space-y-1">

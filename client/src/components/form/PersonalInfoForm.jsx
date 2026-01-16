@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import PropTypes from "prop-types";
+import { X, User, Info } from "lucide-react";
 import { SectionTitleEditor, ValidatedInput } from "../common";
 import { DEFAULT_SECTION_TITLES } from "../../utils/constants";
 import {
@@ -90,32 +91,12 @@ const PersonalInfoForm = ({ personalInfo, onUpdate, onUpdateSectionTitle }) => {
                                     className="absolute top-0 right-0 bg-red-500 text-white rounded-full p-2 opacity-0 group-hover:opacity-100 transition-opacity shadow-lg hover:bg-red-600"
                                     title="Remove photo"
                                 >
-                                    <svg
-                                        className="w-4 h-4"
-                                        fill="none"
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth="2"
-                                        viewBox="0 0 24 24"
-                                        stroke="currentColor"
-                                    >
-                                        <path d="M6 18L18 6M6 6l12 12" />
-                                    </svg>
+                                    <X className="w-4 h-4" />
                                 </button>
                             </div>
                         ) : (
                             <div className="w-32 h-32 rounded-full bg-gray-100 border-4 border-gray-200 flex items-center justify-center">
-                                <svg
-                                    className="w-16 h-16 text-gray-400"
-                                    fill="none"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth="2"
-                                    viewBox="0 0 24 24"
-                                    stroke="currentColor"
-                                >
-                                    <path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                                </svg>
+                                <User className="w-16 h-16 text-gray-400" />
                             </div>
                         )}
                     </div>
@@ -208,17 +189,7 @@ const PersonalInfoForm = ({ personalInfo, onUpdate, onUpdateSectionTitle }) => {
             {/* Info Box */}
             <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-md">
                 <div className="flex items-start">
-                    <svg
-                        className="w-5 h-5 text-blue-600 mt-0.5 mr-2 flex-shrink-0"
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
-                    >
-                        <path
-                            fillRule="evenodd"
-                            d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
-                            clipRule="evenodd"
-                        />
-                    </svg>
+                    <Info className="w-5 h-5 text-blue-600 mt-0.5 mr-2 flex-shrink-0" />
                     <div className="text-sm text-blue-800">
                         <p className="font-medium">Tips:</p>
                         <ul className="mt-1 list-disc list-inside space-y-1">
