@@ -12,3 +12,4 @@ export { default as ValidatedInput } from "./ValidatedInput";
 export { default as FormattedDescription } from "./FormattedDescription";
 export { default as AIButton } from "./AIButton";
 export { default as AIImproveModal } from "./AIImproveModal";
+export { default as TiptapEditor } from "./TiptapEditor";

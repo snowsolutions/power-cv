@@ -1,9 +1,12 @@
 import { useState, useEffect } from "react";
 import PropTypes from "prop-types";
-import ReactQuill from "react-quill";
-import "react-quill/dist/quill.snow.css";
 import { Info } from "lucide-react";
-import { SectionTitleEditor, AIButton, AIImproveModal } from "../common";
+import {
+    SectionTitleEditor,
+    AIButton,
+    AIImproveModal,
+    TiptapEditor,
+} from "../common";
 import { DEFAULT_SECTION_TITLES } from "../../utils/constants";
 import useDebounce from "../../hooks/useDebounce";
 
@@ -66,31 +69,6 @@ const IntroductionForm = ({ introduction, onUpdate, onUpdateSectionTitle }) => {
         onUpdate(improvedContent);
     };
 
-    // Quill toolbar modules configuration
-    const modules = {
-        toolbar: [
-            [{ header: [1, 2, 3, false] }],
-            ["bold", "italic", "underline", "strike"],
-            [{ list: "ordered" }, { list: "bullet" }],
-            [{ indent: "-1" }, { indent: "+1" }],
-            ["link"],
-            ["clean"],
-        ],
-    };
-
-    // Quill editor formats
-    const formats = [
-        "header",
-        "bold",
-        "italic",
-        "underline",
-        "strike",
-        "list",
-        "bullet",
-        "indent",
-        "link",
-    ];
-
     return (
         <div className="bg-white rounded-lg shadow-md p-6">
             {/* Section Title */}
@@ -115,17 +93,13 @@ const IntroductionForm = ({ introduction, onUpdate, onUpdateSectionTitle }) => {
                         title="Improve with AI"
                     />
                 </div>
-                <div className="quill-wrapper">
-                    <ReactQuill
-                        theme="snow"
-                        value={localContent}
-                        onChange={handleContentChange}
-                        modules={modules}
-                        formats={formats}
-                        placeholder="Write your introduction here... You can use formatting tools above."
-                        className="bg-white"
-                    />
-                </div>
+                <TiptapEditor
+                    content={localContent}
+                    onChange={handleContentChange}
+                    placeholder="Write your introduction here... You can use formatting tools above."
+                    showHeadings={true}
+                    minHeight="200px"
+                />
                 <p className="text-xs text-gray-500 mt-2">
                     Characters: {localContent.replace(/<[^>]*>/g, "").length}
                 </p>
@@ -158,77 +132,6 @@ const IntroductionForm = ({ introduction, onUpdate, onUpdateSectionTitle }) => {
                 onAccept={handleAIAccept}
                 title="Improve Professional Profile"
             />
-
-            {/* Custom Styles for Quill Editor */}
-            <style>{`
-                .quill-wrapper .ql-container {
-                    min-height: 200px;
-                    font-size: 14px;
-                    font-family: inherit;
-                }
-
-                .quill-wrapper .ql-editor {
-                    min-height: 200px;
-                }
-
-                .quill-wrapper .ql-toolbar {
-                    border-top-left-radius: 0.375rem;
-                    border-top-right-radius: 0.375rem;
-                    background-color: #f9fafb;
-                }
-
-                .quill-wrapper .ql-container {
-                    border-bottom-left-radius: 0.375rem;
-                    border-bottom-right-radius: 0.375rem;
-                }
-
-                .quill-wrapper .ql-editor.ql-blank::before {
-                    color: #9ca3af;
-                    font-style: normal;
-                }
-
-                .quill-wrapper .ql-snow .ql-stroke {
-                    stroke: #4b5563;
-                }
-
-                .quill-wrapper .ql-snow .ql-fill {
-                    fill: #4b5563;
-                }
-
-                .quill-wrapper .ql-snow .ql-picker-label {
-                    color: #4b5563;
-                }
-
-                .quill-wrapper .ql-toolbar button:hover,
-                .quill-wrapper .ql-toolbar button:focus {
-                    color: #2563eb;
-                }
-
-                .quill-wrapper .ql-toolbar button:hover .ql-stroke,
-                .quill-wrapper .ql-toolbar button:focus .ql-stroke {
-                    stroke: #2563eb;
-                }
-
-                .quill-wrapper .ql-toolbar button:hover .ql-fill,
-                .quill-wrapper .ql-toolbar button:focus .ql-fill {
-                    fill: #2563eb;
-                }
-
-                .quill-wrapper .ql-snow.ql-toolbar button.ql-active,
-                .quill-wrapper .ql-snow .ql-toolbar button.ql-active {
-                    color: #2563eb;
-                }
-
-                .quill-wrapper .ql-snow.ql-toolbar button.ql-active .ql-stroke,
-                .quill-wrapper .ql-snow .ql-toolbar button.ql-active .ql-stroke {
-                    stroke: #2563eb;
-                }
-
-                .quill-wrapper .ql-snow.ql-toolbar button.ql-active .ql-fill,
-                .quill-wrapper .ql-snow .ql-toolbar button.ql-active .ql-fill {
-                    fill: #2563eb;
-                }
-            `}</style>
         </div>
     );
 };

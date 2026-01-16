@@ -1,20 +1,13 @@
 import { useState, useEffect } from "react";
 import PropTypes from "prop-types";
-import ReactQuill from "react-quill";
-import "react-quill/dist/quill.snow.css";
-import {
-    Trash2,
-    ChevronDown,
-    Plus,
-    Briefcase,
-    Info
-} from "lucide-react";
+import { Trash2, ChevronDown, Plus, Briefcase, Info } from "lucide-react";
 import {
     Input,
     Button,
     SectionTitleEditor,
     AIButton,
     AIImproveModal,
+    TiptapEditor,
 } from "../common";
 import {
     DEFAULT_SECTION_TITLES,
@@ -89,18 +82,6 @@ const WorkHistoryItem = ({
         onUpdate("workHistory", item.id, { description: improvedContent });
     };
 
-    // Quill toolbar modules configuration
-    const modules = {
-        toolbar: [
-            ["bold", "italic", "underline"],
-            [{ list: "ordered" }, { list: "bullet" }],
-            ["clean"],
-        ],
-    };
-
-    // Quill editor formats
-    const formats = ["bold", "italic", "underline", "list", "bullet"];
-
     return (
         <div className="border border-gray-200 rounded-lg mb-4 overflow-hidden">
             {/* Item Header */}
@@ -134,8 +115,9 @@ const WorkHistoryItem = ({
                         <Trash2 className="w-5 h-5" />
                     </button>
                     <ChevronDown
-                        className={`w-5 h-5 text-gray-500 transition-transform ${isExpanded ? "rotate-180" : ""
-                            }`}
+                        className={`w-5 h-5 text-gray-500 transition-transform ${
+                            isExpanded ? "rotate-180" : ""
+                        }`}
                     />
                 </div>
             </div>
@@ -196,17 +178,13 @@ const WorkHistoryItem = ({
                                 title="Improve with AI"
                             />
                         </div>
-                        <div className="quill-wrapper-sm">
-                            <ReactQuill
-                                theme="snow"
-                                value={localDescription}
-                                onChange={handleDescriptionChange}
-                                modules={modules}
-                                formats={formats}
-                                placeholder="Describe your responsibilities, achievements, and key projects..."
-                                className="bg-white"
-                            />
-                        </div>
+                        <TiptapEditor
+                            content={localDescription}
+                            onChange={handleDescriptionChange}
+                            placeholder="Describe your responsibilities, achievements, and key projects..."
+                            showHeadings={false}
+                            minHeight="150px"
+                        />
                         <p className="text-xs text-gray-500 mt-2">
                             Highlight your accomplishments and impact. Use
                             bullet points for better readability.
@@ -222,77 +200,6 @@ const WorkHistoryItem = ({
                             title={`Improve Job Description - ${item.position || "Work Experience"}`}
                         />
                     </div>
-
-                    {/* Custom Styles for Quill Editor */}
-                    <style>{`
-                        .quill-wrapper-sm .ql-container {
-                            min-height: 150px;
-                            font-size: 14px;
-                            font-family: inherit;
-                        }
-
-                        .quill-wrapper-sm .ql-editor {
-                            min-height: 150px;
-                        }
-
-                        .quill-wrapper-sm .ql-toolbar {
-                            border-top-left-radius: 0.375rem;
-                            border-top-right-radius: 0.375rem;
-                            background-color: #f9fafb;
-                        }
-
-                        .quill-wrapper-sm .ql-container {
-                            border-bottom-left-radius: 0.375rem;
-                            border-bottom-right-radius: 0.375rem;
-                        }
-
-                        .quill-wrapper-sm .ql-editor.ql-blank::before {
-                            color: #9ca3af;
-                            font-style: normal;
-                        }
-
-                        .quill-wrapper-sm .ql-snow .ql-stroke {
-                            stroke: #4b5563;
-                        }
-
-                        .quill-wrapper-sm .ql-snow .ql-fill {
-                            fill: #4b5563;
-                        }
-
-                        .quill-wrapper-sm .ql-snow .ql-picker-label {
-                            color: #4b5563;
-                        }
-
-                        .quill-wrapper-sm .ql-toolbar button:hover,
-                        .quill-wrapper-sm .ql-toolbar button:focus {
-                            color: #2563eb;
-                        }
-
-                        .quill-wrapper-sm .ql-toolbar button:hover .ql-stroke,
-                        .quill-wrapper-sm .ql-toolbar button:focus .ql-stroke {
-                            stroke: #2563eb;
-                        }
-
-                        .quill-wrapper-sm .ql-toolbar button:hover .ql-fill,
-                        .quill-wrapper-sm .ql-toolbar button:focus .ql-fill {
-                            fill: #2563eb;
-                        }
-
-                        .quill-wrapper-sm .ql-snow.ql-toolbar button.ql-active,
-                        .quill-wrapper-sm .ql-snow .ql-toolbar button.ql-active {
-                            color: #2563eb;
-                        }
-
-                        .quill-wrapper-sm .ql-snow.ql-toolbar button.ql-active .ql-stroke,
-                        .quill-wrapper-sm .ql-snow .ql-toolbar button.ql-active .ql-stroke {
-                            stroke: #2563eb;
-                        }
-
-                        .quill-wrapper-sm .ql-snow.ql-toolbar button.ql-active .ql-fill,
-                        .quill-wrapper-sm .ql-snow .ql-toolbar button.ql-active .ql-fill {
-                            fill: #2563eb;
-                        }
-                    `}</style>
                 </div>
             )}
         </div>
