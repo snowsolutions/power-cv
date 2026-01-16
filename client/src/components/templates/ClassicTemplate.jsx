@@ -35,119 +35,121 @@ const ClassicTemplate = memo(({ data, currentPage = 1, onPageCountChange }) => {
     // Intelligent page break calculation
     useEffect(() => {
         if (contentRef.current) {
-            const A4_HEIGHT_PX = 1122; // 297mm at 96 DPI
-            const MIN_SECTION_SPACE = 60; // Space needed for section headers
-            const MIN_ITEM_SPACE = 30; // Space needed for regular items
+            // Get the actual viewport height in pixels from the DOM
+            const viewport = contentRef.current.closest(".page-viewport");
+            const A4_HEIGHT_PX = viewport ? viewport.offsetHeight : 1122.51;
+            const BUFFER = 20; // Buffer to prevent cutting content at page bottom
 
-            // Get all breakable items - query separately and combine to prioritize correctly
+            // Get the scale factor (due to zoom) to normalize coordinates
+            const rootRect = contentRef.current.getBoundingClientRect();
+            const scale = rootRect.width / contentRef.current.offsetWidth;
+
+            // Helper to get normalized offsetTop relative to content root
+            const getOffsetTop = (el) => {
+                const elRect = el.getBoundingClientRect();
+                return (elRect.top - rootRect.top) / scale;
+            };
+
+            // Get all items that should avoid being split by a page break
             const h2Headers = Array.from(
                 contentRef.current.querySelectorAll("h2.section-title"),
             );
-            const h3JobTitles = Array.from(
-                contentRef.current.querySelectorAll("h3.job-title"),
+            const h3Headers = Array.from(
+                contentRef.current.querySelectorAll("h3"),
             );
             const pageItems = Array.from(
                 contentRef.current.querySelectorAll(".page-item"),
             );
-
-            // Combine all items, removing page-items that contain h3 job titles
-            const h3Parents = new Set(
-                h3JobTitles.map((h3) => h3.closest(".page-item")),
+            const avoidBreaks = Array.from(
+                contentRef.current.querySelectorAll(".avoid-page-break"),
             );
-            const filteredPageItems = pageItems.filter(
-                (item) => !h3Parents.has(item),
+            const listItems = Array.from(
+                contentRef.current.querySelectorAll("li"),
+            );
+            const sections = Array.from(
+                contentRef.current.querySelectorAll(".page-section"),
             );
 
-            const allItems = [
-                ...h2Headers,
-                ...h3JobTitles,
-                ...filteredPageItems,
-            ];
+            // Combine all potential break points
+            const allItems = Array.from(
+                new Set([
+                    ...h2Headers,
+                    ...h3Headers,
+                    ...pageItems,
+                    ...avoidBreaks,
+                    ...listItems,
+                    ...sections,
+                ]),
+            ).sort((a, b) => {
+                // Sort by position in DOM to ensure we process top-to-bottom
+                return a.compareDocumentPosition(b) &
+                    Node.DOCUMENT_POSITION_FOLLOWING
+                    ? -1
+                    : 1;
+            });
 
             console.log(
-                `[ClassicTemplate] Found ${allItems.length} breakable items (${h2Headers.length} h2, ${h3JobTitles.length} h3, ${filteredPageItems.length} items)`,
+                `[ClassicTemplate] Found ${allItems.length} breakable items. A4_HEIGHT=${A4_HEIGHT_PX}px`,
             );
 
-            let currentPageBottom = A4_HEIGHT_PX;
+            // Reset all previous breaks
+            allItems.forEach((item) => {
+                item.style.marginTop = "";
+                item.classList.remove("force-page-break");
+            });
+
             let pageCount = 1;
 
+            // Iterate through items and apply breaks
             allItems.forEach((item, index) => {
-                // Remove any previous page break class
-                item.classList.remove("force-page-break");
-                item.style.marginTop = "";
-
-                const itemTop = item.offsetTop;
+                // Re-measure item top because previous items' marginTop might have shifted this one
+                const itemTop = getOffsetTop(item);
                 const itemHeight = item.offsetHeight;
                 const itemBottom = itemTop + itemHeight;
 
-                // Determine if this is a section header/title or job title
-                const isSectionHeader = item.tagName === "H2";
-                const isJobTitle =
+                const currentPage =
+                    Math.floor((itemTop + 0.5) / A4_HEIGHT_PX) + 1;
+                const pageBottom = currentPage * A4_HEIGHT_PX;
+
+                // Determine if this is a header or a unit that shouldn't be split
+                const isHeader =
+                    item.tagName === "H2" ||
                     item.tagName === "H3" ||
                     item.classList.contains("job-title");
-                const minSpace = isSectionHeader
-                    ? MIN_SECTION_SPACE
-                    : isJobTitle
-                      ? 50 // Job titles need more space
-                      : MIN_ITEM_SPACE;
+                const isAvoidBreak =
+                    item.classList.contains("avoid-page-break") ||
+                    item.classList.contains("page-item");
 
-                const itemText =
-                    item.textContent?.substring(0, 50) || item.tagName;
+                // If item crosses page boundary
+                if (
+                    itemTop < pageBottom - BUFFER &&
+                    itemBottom > pageBottom - BUFFER
+                ) {
+                    const spaceLeft = pageBottom - itemTop;
 
-                // Log every item for debugging
-                console.log(
-                    `[Item ${index}] "${itemText}" | tag: ${item.tagName} | isH2: ${isSectionHeader} | isH3: ${isJobTitle} | top: ${itemTop}px | bottom: ${itemBottom}px | height: ${itemHeight}px | currentPageBottom: ${currentPageBottom}px`,
-                );
-
-                // Determine which page this item should be on
-                const idealPage = Math.floor(itemTop / A4_HEIGHT_PX) + 1;
-                const idealPageBottom = idealPage * A4_HEIGHT_PX;
-
-                // Check if item would cross the boundary of its ideal page
-                if (itemTop < idealPageBottom && itemBottom > idealPageBottom) {
-                    // Item would be cut by page boundary
-                    const spaceLeft = idealPageBottom - itemTop;
-
-                    // For section headers and job titles, always push to next page if they would be cut
-                    // For items, push if less than minimum space or item is tall
-                    if (
-                        isSectionHeader ||
-                        isJobTitle ||
-                        spaceLeft < minSpace ||
-                        itemHeight > minSpace * 2
-                    ) {
-                        // Push to next page
-                        const pushDistance = idealPageBottom - itemTop;
+                    // Logic for pushing:
+                    // Always push headers, avoid-break items, or items with very little space left
+                    if (isHeader || isAvoidBreak || spaceLeft < 80) {
+                        const pushDistance = pageBottom - itemTop;
                         item.style.marginTop = `${pushDistance}px`;
                         item.classList.add("force-page-break");
 
                         console.log(
-                            `[PageBreak] Item ${index}: "${itemText}" | isHeader: ${isSectionHeader} | isJobTitle: ${isJobTitle} | spaceLeft: ${spaceLeft.toFixed(0)}px | pushDistance: ${pushDistance.toFixed(0)}px | reason: ${isSectionHeader ? "Section Header" : isJobTitle ? "Job Title" : spaceLeft < minSpace ? "Insufficient Space" : "Item Too Tall"}`,
+                            `[PageBreak] Pushing item ${index} ("${item.textContent?.substring(0, 15)}...") by ${pushDistance.toFixed(1)}px`,
                         );
-
-                        // Update tracking
-                        const newPage = idealPage + 1;
-                        if (newPage > pageCount) {
-                            pageCount = newPage;
-                        }
                     }
                 }
-
-                // Update currentPageBottom for tracking
-                const itemPage = Math.ceil(itemBottom / A4_HEIGHT_PX);
-                currentPageBottom = Math.max(
-                    currentPageBottom,
-                    itemPage * A4_HEIGHT_PX,
-                );
             });
 
-            // Final page count based on total height
+            // Final check of total height to update page count
             const totalHeight = contentRef.current.scrollHeight;
-            const calculatedPages = Math.ceil(totalHeight / A4_HEIGHT_PX);
-            const finalPageCount = Math.max(pageCount, calculatedPages);
+            const finalPageCount = Math.max(
+                pageCount,
+                Math.ceil(totalHeight / A4_HEIGHT_PX),
+            );
 
             console.log(
-                `[ClassicTemplate] Complete: totalHeight=${totalHeight}px | pageCount=${pageCount} | calculatedPages=${calculatedPages} | finalPageCount=${finalPageCount}`,
+                `[ClassicTemplate] Final: totalHeight=${totalHeight}px, pageCount=${finalPageCount}`,
             );
 
             if (onPageCountChange) {
@@ -170,12 +172,12 @@ const ClassicTemplate = memo(({ data, currentPage = 1, onPageCountChange }) => {
                 >
                     {/* Header Section - Centered Traditional Style */}
                     <div className="border-b-4 border-gray-800 px-8 py-6 print:px-12 print:py-8 text-center page-section-header">
-                        <h1 className="text-3xl font-bold text-gray-900 mb-3 uppercase tracking-wide">
+                        <h1 className="text-2xl font-bold text-gray-900 mb-3 uppercase tracking-wide">
                             {personalInfo.name || "Your Name"}
                         </h1>
 
                         {/* Contact Information - Horizontal Layout */}
-                        <div className="flex flex-wrap items-center justify-center gap-4 text-sm text-gray-700">
+                        <div className="flex flex-wrap items-center justify-center gap-4 text-xs text-gray-700">
                             {personalInfo.email && (
                                 <div className="flex items-center gap-1">
                                     <span className="font-semibold">
@@ -214,13 +216,13 @@ const ClassicTemplate = memo(({ data, currentPage = 1, onPageCountChange }) => {
                     <div className="px-8 py-6 print:px-12 print:py-8 space-y-6">
                         {/* Introduction Section */}
                         {hasContent(introduction) && (
-                            <section className="mb-6 page-section">
-                                <h2 className="text-lg font-bold text-gray-900 mb-2 pb-1 border-b-2 border-gray-800 uppercase tracking-wide section-title">
+                            <section className="mb-6 page-section avoid-page-break">
+                                <h2 className="text-base font-bold text-gray-900 mb-2 pb-1 border-b-2 border-gray-800 uppercase tracking-wide section-title">
                                     {introduction.sectionTitle ||
                                         "Professional Summary"}
                                 </h2>
                                 <div
-                                    className="prose prose-sm max-w-none text-gray-700 leading-relaxed text-justify"
+                                    className="prose prose-xs max-w-none text-gray-700 leading-relaxed text-justify text-xs"
                                     dangerouslySetInnerHTML={{
                                         __html: introduction.content,
                                     }}
@@ -230,8 +232,8 @@ const ClassicTemplate = memo(({ data, currentPage = 1, onPageCountChange }) => {
 
                         {/* Professional Skills Section */}
                         {hasContent(professionalSkills) && (
-                            <section className="mb-6 page-section">
-                                <h2 className="text-lg font-bold text-gray-900 mb-2 pb-1 border-b-2 border-gray-800 uppercase tracking-wide section-title">
+                            <section className="mb-6 page-section avoid-page-break">
+                                <h2 className="text-base font-bold text-gray-900 mb-2 pb-1 border-b-2 border-gray-800 uppercase tracking-wide section-title">
                                     {professionalSkills.sectionTitle ||
                                         "Professional Skills"}
                                 </h2>
@@ -245,12 +247,12 @@ const ClassicTemplate = memo(({ data, currentPage = 1, onPageCountChange }) => {
                                                 •
                                             </span>
                                             <div className="flex-grow">
-                                                <span className="text-gray-800 font-semibold">
+                                                <span className="text-gray-800 font-semibold text-xs">
                                                     {skill.skillName}
                                                 </span>
-                                                {skill.proficiency && (
-                                                    <span className="text-gray-600 text-sm ml-2">
-                                                        ({skill.proficiency})
+                                                {skill.level && (
+                                                    <span className="text-gray-600 text-xs ml-2">
+                                                        ({skill.level})
                                                     </span>
                                                 )}
                                             </div>
@@ -263,7 +265,7 @@ const ClassicTemplate = memo(({ data, currentPage = 1, onPageCountChange }) => {
                         {/* Work History Section */}
                         {hasContent(workHistory) && (
                             <section className="mb-6 page-section">
-                                <h2 className="text-lg font-bold text-gray-900 mb-2 pb-1 border-b-2 border-gray-800 uppercase tracking-wide section-title">
+                                <h2 className="text-base font-bold text-gray-900 mb-2 pb-1 border-b-2 border-gray-800 uppercase tracking-wide section-title">
                                     {workHistory.sectionTitle ||
                                         "Professional Experience"}
                                 </h2>
@@ -271,18 +273,18 @@ const ClassicTemplate = memo(({ data, currentPage = 1, onPageCountChange }) => {
                                     {workHistory.items.map((work) => (
                                         <div
                                             key={work.id}
-                                            className="page-item pb-3"
+                                            className="page-item pb-3 avoid-page-break"
                                         >
                                             <div className="flex justify-between items-start mb-1">
                                                 <div className="flex-grow">
-                                                    <h3 className="text-base font-bold text-gray-900 job-title">
+                                                    <h3 className="text-sm font-bold text-gray-900 job-title">
                                                         {work.position}
                                                     </h3>
-                                                    <p className="text-md font-semibold text-gray-700 italic">
+                                                    <p className="text-sm font-semibold text-gray-700 italic">
                                                         {work.companyName}
                                                     </p>
                                                 </div>
-                                                <div className="text-sm text-gray-600 text-right ml-4 flex-shrink-0">
+                                                <div className="text-xs text-gray-600 text-right ml-4 flex-shrink-0">
                                                     <p>
                                                         {work.dateFrom} -{" "}
                                                         {work.dateTo ||
@@ -293,7 +295,7 @@ const ClassicTemplate = memo(({ data, currentPage = 1, onPageCountChange }) => {
                                             {work.description && (
                                                 <FormattedDescription
                                                     text={work.description}
-                                                    className="text-sm text-gray-700 leading-relaxed text-justify mt-2"
+                                                    className="text-xs text-gray-700 leading-relaxed text-justify mt-2"
                                                 />
                                             )}
                                         </div>
@@ -305,25 +307,25 @@ const ClassicTemplate = memo(({ data, currentPage = 1, onPageCountChange }) => {
                         {/* Education Section */}
                         {hasContent(educations) && (
                             <section className="mb-6 page-section">
-                                <h2 className="text-lg font-bold text-gray-900 mb-2 pb-1 border-b-2 border-gray-800 uppercase tracking-wide section-title">
+                                <h2 className="text-base font-bold text-gray-900 mb-2 pb-1 border-b-2 border-gray-800 uppercase tracking-wide section-title">
                                     {educations.sectionTitle || "Education"}
                                 </h2>
                                 <div className="space-y-4">
                                     {educations.items.map((edu) => (
                                         <div
                                             key={edu.id}
-                                            className="page-item pb-2"
+                                            className="page-item pb-2 avoid-page-break"
                                         >
                                             <div className="flex justify-between items-start">
                                                 <div className="flex-grow">
-                                                    <h3 className="text-base font-bold text-gray-900">
+                                                    <h3 className="text-sm font-bold text-gray-900">
                                                         {edu.profession}
                                                     </h3>
-                                                    <p className="text-md font-semibold text-gray-700 italic">
+                                                    <p className="text-sm font-semibold text-gray-700 italic">
                                                         {edu.schoolName}
                                                     </p>
                                                 </div>
-                                                <div className="text-sm text-gray-600 text-right ml-4 flex-shrink-0">
+                                                <div className="text-xs text-gray-600 text-right ml-4 flex-shrink-0">
                                                     <p>
                                                         {edu.studyFrom} -{" "}
                                                         {edu.studyTo ||
@@ -340,7 +342,7 @@ const ClassicTemplate = memo(({ data, currentPage = 1, onPageCountChange }) => {
                         {/* Certifications Section */}
                         {hasContent(certifications) && (
                             <section className="mb-6 page-section">
-                                <h2 className="text-lg font-bold text-gray-900 mb-2 pb-1 border-b-2 border-gray-800 uppercase tracking-wide section-title">
+                                <h2 className="text-base font-bold text-gray-900 mb-2 pb-1 border-b-2 border-gray-800 uppercase tracking-wide section-title">
                                     {certifications.sectionTitle ||
                                         "Certifications"}
                                 </h2>
@@ -348,16 +350,16 @@ const ClassicTemplate = memo(({ data, currentPage = 1, onPageCountChange }) => {
                                     {certifications.items.map((cert) => (
                                         <div
                                             key={cert.id}
-                                            className="flex items-start gap-2 page-item pb-2"
+                                            className="flex items-start gap-2 page-item pb-2 avoid-page-break"
                                         >
                                             <span className="text-gray-800 font-medium mt-1">
                                                 •
                                             </span>
                                             <div className="flex-grow">
-                                                <h3 className="text-base font-bold text-gray-900">
+                                                <h3 className="text-sm font-bold text-gray-900">
                                                     {cert.certName}
                                                 </h3>
-                                                <p className="text-sm text-gray-600">
+                                                <p className="text-xs text-gray-600">
                                                     {cert.organization}
                                                     {cert.certExpiration && (
                                                         <span className="text-gray-600">
@@ -374,7 +376,7 @@ const ClassicTemplate = memo(({ data, currentPage = 1, onPageCountChange }) => {
                                                         href={cert.certLink}
                                                         target="_blank"
                                                         rel="noopener noreferrer"
-                                                        className="text-sm text-blue-700 hover:underline"
+                                                        className="text-xs text-blue-700 hover:underline"
                                                     >
                                                         {cert.certLink}
                                                     </a>
@@ -389,7 +391,7 @@ const ClassicTemplate = memo(({ data, currentPage = 1, onPageCountChange }) => {
                         {/* Activities Section */}
                         {hasContent(activities) && (
                             <section className="mb-6 page-section">
-                                <h2 className="text-lg font-bold text-gray-900 mb-2 pb-1 border-b-2 border-gray-800 uppercase tracking-wide section-title">
+                                <h2 className="text-base font-bold text-gray-900 mb-2 pb-1 border-b-2 border-gray-800 uppercase tracking-wide section-title">
                                     {activities.sectionTitle ||
                                         "Activities & Achievements"}
                                 </h2>
@@ -397,14 +399,14 @@ const ClassicTemplate = memo(({ data, currentPage = 1, onPageCountChange }) => {
                                     {activities.items.map((activity) => (
                                         <div
                                             key={activity.id}
-                                            className="page-item pb-3"
+                                            className="page-item pb-3 avoid-page-break"
                                         >
                                             <div className="flex justify-between items-start mb-1">
-                                                <h3 className="text-base font-bold text-gray-900 flex-grow">
+                                                <h3 className="text-sm font-bold text-gray-900 flex-grow">
                                                     {activity.activityName}
                                                 </h3>
                                                 {activity.activityDate && (
-                                                    <span className="text-sm text-gray-600 ml-4 flex-shrink-0">
+                                                    <span className="text-xs text-gray-600 ml-4 flex-shrink-0">
                                                         {activity.activityDate}
                                                     </span>
                                                 )}
@@ -412,7 +414,7 @@ const ClassicTemplate = memo(({ data, currentPage = 1, onPageCountChange }) => {
                                             {activity.description && (
                                                 <FormattedDescription
                                                     text={activity.description}
-                                                    className="text-sm text-gray-700 leading-relaxed text-justify mt-2"
+                                                    className="text-xs text-gray-700 leading-relaxed text-justify mt-2"
                                                 />
                                             )}
                                         </div>
@@ -423,8 +425,8 @@ const ClassicTemplate = memo(({ data, currentPage = 1, onPageCountChange }) => {
 
                         {/* Language Competencies Section */}
                         {hasContent(languageCompetencies) && (
-                            <section className="mb-6 page-section">
-                                <h2 className="text-lg font-bold text-gray-900 mb-2 pb-1 border-b-2 border-gray-800 uppercase tracking-wide section-title">
+                            <section className="mb-6 page-section avoid-page-break">
+                                <h2 className="text-base font-bold text-gray-900 mb-2 pb-1 border-b-2 border-gray-800 uppercase tracking-wide section-title">
                                     {languageCompetencies.sectionTitle ||
                                         "Languages"}
                                 </h2>
@@ -438,11 +440,11 @@ const ClassicTemplate = memo(({ data, currentPage = 1, onPageCountChange }) => {
                                                 •
                                             </span>
                                             <div className="flex-grow">
-                                                <span className="text-gray-800 font-semibold">
-                                                    {lang.languageName}
+                                                <span className="text-gray-800 font-semibold text-xs">
+                                                    {lang.language}
                                                 </span>
                                                 {lang.proficiency && (
-                                                    <span className="text-gray-600 text-sm ml-2">
+                                                    <span className="text-gray-600 text-xs ml-2">
                                                         ({lang.proficiency})
                                                     </span>
                                                 )}

@@ -1,151 +1,151 @@
 {
-  "version": "1.0.0",
-  "exportDate": "2026-01-15T10:30:00.000Z",
-  "cv": {
-    "id": "sample-cv-nguyen-ngoc-hien",
-    "name": "Nguyen Ngoc Hien - Product Manager CV",
-    "template": "modern",
-    "data": {
-      "personalInfo": {
-        "sectionTitle": "Personal Information",
-        "name": "Nguyen Ngoc Hien",
-        "email": "nguyenngochien250598@gmail.com",
-        "phone": "(+84) 373 688 877",
-        "address": "District 1, Ho Chi Minh City",
-        "avatar": ""
-      },
-      "introduction": {
-        "sectionTitle": "Professional Profile",
-        "content": "<p><strong>Product Management | Team-oriented Leadership | Account Management</strong></p><ul><li>Results-driven Product Owner and Business Analyst with over 5 years of experience in software development, specializing in managing outsourcing projects and delivering high-quality solutions.</li><li>Proven ability to lead cross-functional teams, bridging communication between stakeholders and development teams to ensure timely and valuable feature delivery.</li><li>Skilled in Agile methodologies, sprint management, and producing clear, concise functional documentation under tight deadlines.</li><li>Solid & good understanding in web and mobile application development, including backend-frontend integrations, third-party services, cloud services, and architectural patterns (monolith and microservice). Understand SQL, REST API design to close the distance to engineering team.</li><li>Adept at managing multiple roles, including Business Consultant and Analyst, driving client transformations from initial contact through to successful project delivery.</li><li>Proficient in budget management, negotiation, logical thinking and decisive action.</li></ul>"
-      },
-      "workHistory": {
-        "sectionTitle": "Career Summary",
-        "items": [
-          {
-            "id": "work-1",
-            "dateFrom": "2021-08",
-            "dateTo": "2026-01",
-            "companyName": "Groove Technology",
-            "position": "Project Manager/Product Owner",
-            "description": "• Streamlining Workflow Efficiency: Developed a custom project management dashboard that integrated data from multiple sources, reducing manual reporting time by 50% for team size from 7-9 members.\n\n• Data-Driven in Decision Making: Developed dashboards that integrated user analytics and feedback to guide product improvements, reducing feature churn by 25%.\n\n• Client-oriented: Led and successfully delivered multiple outsourcing projects with 100% client satisfaction, ensuring timely and quality-driven results.\n\n• Fit all hats: Took on dual roles as Business Consultant and Business Analyst, managing both the technical and business aspects of projects.\n\n• Seamless integration: Acted as a key bridge between the development team and stakeholders, ensuring the delivery of valuable features within expected timelines.\n\n• Well-applied K.I.S.S principle: Facilitate sprint events that fit in the situation, respect the design. Keep processes simple as possible while maintain the effective of information transmission. Avoid hell loop of things that waste most valuable resource – Time.\n\n• \"It's should be written somewhere\": Produced detailed functional documentation when required to ensure clarity and alignment on requirements and specifications."
-          },
-          {
-            "id": "work-2",
-            "dateFrom": "2019-10",
-            "dateTo": "2021-07",
-            "companyName": "SECOMM SC",
-            "position": "Project Manager",
-            "description": "• Stakeholder Management: Analyzed BRD, add-on requests, pricing methods, composed and closed contracts. Developed implementation methodologies to rein in project costs while meeting key milestones.\n\n• Project Initiation: Developed and initiated projects, including managing costs, schedule, and performance. Decreased project costs by 15-20% through effective resource utilization and risk management from the initial phase.\n\n• Compliance Assurance: Quickly and efficiently ensured internal compliance to maintain qualified deliverables as scheduled.\n\n• Workflow Optimization: Arranged and rolled out company projects and products to promote new workflow and vision. Handled dual roles as Project Manager and Business Analyst for company products.\n\n• Team Success: Drove team success through shared vision and recognition of quality performance.\n\n• Process Improvement: Provided accurate and detailed quantity take-offs from project drawings and technical specifications by mapping business objectives and operational processes for improvement."
-          }
-        ]
-      },
-      "certifications": {
-        "sectionTitle": "Certifications",
-        "items": [
-          {
-            "id": "cert-1",
-            "certName": "Project Management Professional (PMP)®",
-            "organization": "PMI",
-            "certLink": "https://www.credly.com/badges/795525cb-7269-46c5-98d7-a98080802626",
-            "certExpiration": "2028-11-30"
-          },
-          {
-            "id": "cert-2",
-            "certName": "Certified Cloud Practitioner",
-            "organization": "AWS",
-            "certLink": "https://www.credly.com/badges/912673b7-8d6b-45a9-8ac6-27b9fbcf631e/public_url",
-            "certExpiration": "2027-08-31"
-          },
-          {
-            "id": "cert-3",
-            "certName": "Certified Oracle Generative AI Professional",
-            "organization": "Oracle",
-            "certLink": "https://catalog-education.oracle.com/ords/certview/sharebadge?id=8729EECC8460DBC4A55DE87BC476D4E10D9907389253BC92DFD40A601E3B860C",
-            "certExpiration": "2027-10-31"
-          },
-          {
-            "id": "cert-4",
-            "certName": "Certified Business Analysis Professional™",
-            "organization": "IIBA",
-            "certLink": "https://www.credential.net/09da455a-eb5c-4d5d-ac56-75be50dc1a81#acc.0NL695i4",
-            "certExpiration": "2028-01-31"
-          }
-        ]
-      },
-      "educations": {
-        "sectionTitle": "Education",
-        "items": [
-          {
-            "id": "edu-1",
-            "schoolName": "University of Economic HCMC",
-            "studyFrom": "2015-09",
-            "studyTo": "2019-11",
-            "profession": "Bachelor of Marketing"
-          }
-        ]
-      },
-      "activities": {
-        "sectionTitle": "Activities",
-        "items": []
-      },
-      "professionalSkills": {
-        "sectionTitle": "Professional Skills",
-        "items": [
-          {
-            "id": "skill-1",
-            "skillName": "Project Management",
-            "level": "Expert",
-            "description": "Consistent, transparent, ability to wear different hats and multitasking"
-          },
-          {
-            "id": "skill-2",
-            "skillName": "Communication & Negotiation",
-            "level": "Expert",
-            "description": "Excellent interpersonal and communication skills, negotiation, problem-solving abilities"
-          },
-          {
-            "id": "skill-3",
-            "skillName": "Account Management",
-            "level": "Advanced",
-            "description": "Effective account management, incidents & feedback handling"
-          },
-          {
-            "id": "skill-4",
-            "skillName": "Agile Methodologies",
-            "level": "Expert",
-            "description": "Sprint management, scrum events facilitation, K.I.S.S principle application"
-          },
-          {
-            "id": "skill-5",
-            "skillName": "Technical Understanding",
-            "level": "Advanced",
-            "description": "Web/mobile development, SQL, REST API design, cloud services, microservices architecture"
-          },
-          {
-            "id": "skill-6",
-            "skillName": "Adaptability & Learning",
-            "level": "Expert",
-            "description": "Fast learning to be adaptable quickly to new environment and technology"
-          }
-        ]
-      },
-      "languageCompetencies": {
-        "sectionTitle": "Language Competencies",
-        "items": [
-          {
-            "id": "lang-1",
-            "language": "Vietnamese",
-            "proficiency": "Native"
-          },
-          {
-            "id": "lang-2",
-            "language": "English",
-            "proficiency": "Professional"
-          }
-        ]
-      }
-    },
-    "createdAt": "2026-01-15T10:30:00.000Z",
-    "updatedAt": "2026-01-15T10:30:00.000Z"
-  }
+    "version": "1.0.0",
+    "exportDate": "2026-01-15T10:30:00.000Z",
+    "cv": {
+        "id": "sample-cv-nguyen-ngoc-hien",
+        "name": "Nguyen Ngoc Hien - Product Manager CV",
+        "template": "classic",
+        "data": {
+            "personalInfo": {
+                "sectionTitle": "Personal Information",
+                "name": "Nguyen Ngoc Hien",
+                "email": "nguyenngochien250598@gmail.com",
+                "phone": "(+84) 373 688 877",
+                "address": "District 1, Ho Chi Minh City",
+                "avatar": ""
+            },
+            "introduction": {
+                "sectionTitle": "Professional Profile",
+                "content": "<p><strong>Product Management | Team-oriented Leadership | Account Management</strong></p><ul><li>Results-driven Product Owner and Business Analyst with over 5 years of experience in software development, specializing in managing outsourcing projects and delivering high-quality solutions.</li><li>Proven ability to lead cross-functional teams, bridging communication between stakeholders and development teams to ensure timely and valuable feature delivery.</li><li>Skilled in Agile methodologies, sprint management, and producing clear, concise functional documentation under tight deadlines.</li><li>Solid & good understanding in web and mobile application development, including backend-frontend integrations, third-party services, cloud services, and architectural patterns (monolith and microservice). Understand SQL, REST API design to close the distance to engineering team.</li><li>Adept at managing multiple roles, including Business Consultant and Analyst, driving client transformations from initial contact through to successful project delivery.</li><li>Proficient in budget management, negotiation, logical thinking and decisive action.</li></ul>"
+            },
+            "workHistory": {
+                "sectionTitle": "Career Summary",
+                "items": [
+                    {
+                        "id": "work-1",
+                        "dateFrom": "2021-08",
+                        "dateTo": "2026-01",
+                        "companyName": "Groove Technology",
+                        "position": "Project Manager/Product Owner",
+                        "description": "• Streamlining Workflow Efficiency: Developed a custom project management dashboard that integrated data from multiple sources, reducing manual reporting time by 50% for team size from 7-9 members.\n\n• Data-Driven in Decision Making: Developed dashboards that integrated user analytics and feedback to guide product improvements, reducing feature churn by 25%.\n\n• Client-oriented: Led and successfully delivered multiple outsourcing projects with 100% client satisfaction, ensuring timely and quality-driven results.\n\n• Fit all hats: Took on dual roles as Business Consultant and Business Analyst, managing both the technical and business aspects of projects.\n\n• Seamless integration: Acted as a key bridge between the development team and stakeholders, ensuring the delivery of valuable features within expected timelines.\n\n• Well-applied K.I.S.S principle: Facilitate sprint events that fit in the situation, respect the design. Keep processes simple as possible while maintain the effective of information transmission. Avoid hell loop of things that waste most valuable resource – Time.\n\n• \"It's should be written somewhere\": Produced detailed functional documentation when required to ensure clarity and alignment on requirements and specifications."
+                    },
+                    {
+                        "id": "work-2",
+                        "dateFrom": "2019-10",
+                        "dateTo": "2021-07",
+                        "companyName": "SECOMM SC",
+                        "position": "Project Manager",
+                        "description": "• Stakeholder Management: Analyzed BRD, add-on requests, pricing methods, composed and closed contracts. Developed implementation methodologies to rein in project costs while meeting key milestones.\n\n• Project Initiation: Developed and initiated projects, including managing costs, schedule, and performance. Decreased project costs by 15-20% through effective resource utilization and risk management from the initial phase.\n\n• Compliance Assurance: Quickly and efficiently ensured internal compliance to maintain qualified deliverables as scheduled.\n\n• Workflow Optimization: Arranged and rolled out company projects and products to promote new workflow and vision. Handled dual roles as Project Manager and Business Analyst for company products.\n\n• Team Success: Drove team success through shared vision and recognition of quality performance.\n\n• Process Improvement: Provided accurate and detailed quantity take-offs from project drawings and technical specifications by mapping business objectives and operational processes for improvement."
+                    }
+                ]
+            },
+            "certifications": {
+                "sectionTitle": "Certifications",
+                "items": [
+                    {
+                        "id": "cert-1",
+                        "certName": "Project Management Professional (PMP)®",
+                        "organization": "PMI",
+                        "certLink": "https://www.credly.com/badges/795525cb-7269-46c5-98d7-a98080802626",
+                        "certExpiration": "2028-11-30"
+                    },
+                    {
+                        "id": "cert-2",
+                        "certName": "Certified Cloud Practitioner",
+                        "organization": "AWS",
+                        "certLink": "https://www.credly.com/badges/912673b7-8d6b-45a9-8ac6-27b9fbcf631e/public_url",
+                        "certExpiration": "2027-08-31"
+                    },
+                    {
+                        "id": "cert-3",
+                        "certName": "Certified Oracle Generative AI Professional",
+                        "organization": "Oracle",
+                        "certLink": "https://catalog-education.oracle.com/ords/certview/sharebadge?id=8729EECC8460DBC4A55DE87BC476D4E10D9907389253BC92DFD40A601E3B860C",
+                        "certExpiration": "2027-10-31"
+                    },
+                    {
+                        "id": "cert-4",
+                        "certName": "Certified Business Analysis Professional™",
+                        "organization": "IIBA",
+                        "certLink": "https://www.credential.net/09da455a-eb5c-4d5d-ac56-75be50dc1a81#acc.0NL695i4",
+                        "certExpiration": "2028-01-31"
+                    }
+                ]
+            },
+            "educations": {
+                "sectionTitle": "Education",
+                "items": [
+                    {
+                        "id": "edu-1",
+                        "schoolName": "University of Economic HCMC",
+                        "studyFrom": "2015-09",
+                        "studyTo": "2019-11",
+                        "profession": "Bachelor of Marketing"
+                    }
+                ]
+            },
+            "activities": {
+                "sectionTitle": "Activities",
+                "items": []
+            },
+            "professionalSkills": {
+                "sectionTitle": "Professional Skills",
+                "items": [
+                    {
+                        "id": "skill-1",
+                        "skillName": "Project Management",
+                        "level": "Expert",
+                        "description": "Consistent, transparent, ability to wear different hats and multitasking"
+                    },
+                    {
+                        "id": "skill-2",
+                        "skillName": "Communication & Negotiation",
+                        "level": "Expert",
+                        "description": "Excellent interpersonal and communication skills, negotiation, problem-solving abilities"
+                    },
+                    {
+                        "id": "skill-3",
+                        "skillName": "Account Management",
+                        "level": "Advanced",
+                        "description": "Effective account management, incidents & feedback handling"
+                    },
+                    {
+                        "id": "skill-4",
+                        "skillName": "Agile Methodologies",
+                        "level": "Expert",
+                        "description": "Sprint management, scrum events facilitation, K.I.S.S principle application"
+                    },
+                    {
+                        "id": "skill-5",
+                        "skillName": "Technical Understanding",
+                        "level": "Advanced",
+                        "description": "Web/mobile development, SQL, REST API design, cloud services, microservices architecture"
+                    },
+                    {
+                        "id": "skill-6",
+                        "skillName": "Adaptability & Learning",
+                        "level": "Expert",
+                        "description": "Fast learning to be adaptable quickly to new environment and technology"
+                    }
+                ]
+            },
+            "languageCompetencies": {
+                "sectionTitle": "Language Competencies",
+                "items": [
+                    {
+                        "id": "lang-1",
+                        "language": "Vietnamese",
+                        "proficiency": "Native"
+                    },
+                    {
+                        "id": "lang-2",
+                        "language": "English",
+                        "proficiency": "Professional"
+                    }
+                ]
+            }
+        },
+        "createdAt": "2026-01-15T10:30:00.000Z",
+        "updatedAt": "2026-01-15T10:30:00.000Z"
+    }
 }

@@ -12,19 +12,11 @@ export const DEFAULT_SECTION_TITLES = {
 
 // CV Templates
 export const TEMPLATES = {
-    MODERN: "modern",
     CLASSIC: "classic",
-    CREATIVE: "creative",
-    MINIMAL: "minimal",
 };
 
 // Skill levels for professional skills
-export const SKILL_LEVELS = [
-    "Beginner",
-    "Intermediate",
-    "Advanced",
-    "Expert",
-];
+export const SKILL_LEVELS = ["Beginner", "Intermediate", "Advanced", "Expert"];
 
 // Language proficiency levels
 export const LANGUAGE_PROFICIENCY = [

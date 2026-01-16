@@ -1,11 +1,6 @@
 import { useState, memo, useRef } from "react";
 import PropTypes from "prop-types";
-import {
-    ModernTemplate,
-    ClassicTemplate,
-    CreativeTemplate,
-    MinimalTemplate,
-} from "../templates";
+import { ClassicTemplate } from "../templates";
 import { exportToPDF } from "../../utils/pdfExport";
 
 /**
@@ -18,16 +13,9 @@ import { exportToPDF } from "../../utils/pdfExport";
  * @returns {JSX.Element} CV Preview component
  */
 const CVPreview = memo(
-    ({
-        data,
-        template = "modern",
-        isVisible = true,
-        onToggleVisibility,
-        onTemplateChange,
-    }) => {
+    ({ data, template = "classic", isVisible = true, onToggleVisibility }) => {
         const [zoom, setZoom] = useState(100);
         const [isExporting, setIsExporting] = useState(false);
-        const [showTemplateSelector, setShowTemplateSelector] = useState(false);
         const [pageCount, setPageCount] = useState(1);
         const [currentPage, setCurrentPage] = useState(1);
         const previewRef = useRef(null);
@@ -91,55 +79,13 @@ const CVPreview = memo(
 
         // Template mapping
         const getTemplate = () => {
-            switch (template.toLowerCase()) {
-                case "modern":
-                    return <ModernTemplate data={data} />;
-                case "classic":
-                    return (
-                        <ClassicTemplate
-                            data={data}
-                            currentPage={currentPage}
-                            onPageCountChange={handlePageCountChange}
-                        />
-                    );
-                case "creative":
-                    return <CreativeTemplate data={data} />;
-                case "minimal":
-                    return <MinimalTemplate data={data} />;
-                default:
-                    return <ModernTemplate data={data} />;
-            }
-        };
-
-        // Available templates
-        const templates = [
-            {
-                id: "modern",
-                name: "Modern",
-                description: "Professional two-column layout",
-            },
-            {
-                id: "classic",
-                name: "Classic",
-                description: "Traditional single-column",
-            },
-            {
-                id: "creative",
-                name: "Creative",
-                description: "Colorful sidebar design",
-            },
-            {
-                id: "minimal",
-                name: "Minimal",
-                description: "Clean minimalist style",
-            },
-        ];
-
-        const handleTemplateChange = (templateId) => {
-            if (onTemplateChange) {
-                onTemplateChange(templateId);
-            }
-            setShowTemplateSelector(false);
+            return (
+                <ClassicTemplate
+                    data={data}
+                    currentPage={currentPage}
+                    onPageCountChange={handlePageCountChange}
+                />
+            );
         };
 
         if (!isVisible) {
@@ -178,69 +124,6 @@ const CVPreview = memo(
                     </h2>
 
                     <div className="flex items-center gap-2 flex-wrap">
-                        {/* Template Selector Button */}
-                        {onTemplateChange && (
-                            <div className="relative">
-                                <button
-                                    onClick={() =>
-                                        setShowTemplateSelector(
-                                            !showTemplateSelector,
-                                        )
-                                    }
-                                    className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
-                                    title="Change Template"
-                                >
-                                    <svg
-                                        className="w-5 h-5"
-                                        fill="none"
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth="2"
-                                        viewBox="0 0 24 24"
-                                        stroke="currentColor"
-                                    >
-                                        <path d="M4 5a1 1 0 011-1h4a1 1 0 011 1v7a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM14 5a1 1 0 011-1h4a1 1 0 011 1v7a1 1 0 01-1 1h-4a1 1 0 01-1-1V5zM4 16a1 1 0 011-1h4a1 1 0 011 1v3a1 1 0 01-1 1H5a1 1 0 01-1-1v-3zM14 16a1 1 0 011-1h4a1 1 0 011 1v3a1 1 0 01-1 1h-4a1 1 0 01-1-1v-3z" />
-                                    </svg>
-                                    <span className="hidden sm:inline capitalize">
-                                        {template}
-                                    </span>
-                                </button>
-
-                                {/* Template Selector Dropdown */}
-                                {showTemplateSelector && (
-                                    <div className="absolute top-full mt-2 left-0 bg-white border border-gray-200 rounded-lg shadow-xl z-10 min-w-[280px]">
-                                        <div className="p-2">
-                                            <div className="text-xs font-semibold text-gray-500 uppercase px-3 py-2">
-                                                Select Template
-                                            </div>
-                                            {templates.map((t) => (
-                                                <button
-                                                    key={t.id}
-                                                    onClick={() =>
-                                                        handleTemplateChange(
-                                                            t.id,
-                                                        )
-                                                    }
-                                                    className={`w-full text-left px-3 py-2 rounded-md transition-colors ${
-                                                        template === t.id
-                                                            ? "bg-blue-50 text-blue-700"
-                                                            : "hover:bg-gray-50 text-gray-700"
-                                                    }`}
-                                                >
-                                                    <div className="font-medium">
-                                                        {t.name}
-                                                    </div>
-                                                    <div className="text-xs text-gray-500">
-                                                        {t.description}
-                                                    </div>
-                                                </button>
-                                            ))}
-                                        </div>
-                                    </div>
-                                )}
-                            </div>
-                        )}
-
                         {/* Zoom Controls */}
                         <div className="flex items-center gap-2 bg-white rounded-lg border border-gray-200 p-1">
                             <button
@@ -502,7 +385,6 @@ CVPreview.propTypes = {
     template: PropTypes.string,
     isVisible: PropTypes.bool,
     onToggleVisibility: PropTypes.func,
-    onTemplateChange: PropTypes.func,
 };
 
 CVPreview.displayName = "CVPreview";

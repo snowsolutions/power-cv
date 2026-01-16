@@ -12,7 +12,7 @@ import {
     LanguageCompetenciesForm,
 } from "../components/form";
 import { CVPreview } from "../components/cv";
-import { ModernTemplate } from "../components/templates";
+import { ClassicTemplate } from "../components/templates";
 
 function CVEditor() {
     const { id } = useParams();
@@ -35,7 +35,6 @@ function CVEditor() {
         isPreviewVisible,
         togglePreview,
         selectedTemplate,
-        setTemplate,
         saveCV,
         loadCVFromBackend,
         isLoading,
@@ -266,6 +265,7 @@ function CVEditor() {
                         />
 
                         <IntroductionForm
+                            key={`${currentCV.id}-${currentCV.updatedAt}`}
                             introduction={currentCV.data.introduction}
                             onUpdate={updateIntroduction}
                             onUpdateSectionTitle={updateSectionTitle}
@@ -332,7 +332,6 @@ function CVEditor() {
                                 template={selectedTemplate}
                                 isVisible={isPreviewVisible}
                                 onToggleVisibility={togglePreview}
-                                onTemplateChange={setTemplate}
                             />
                         </div>
                     </div>
@@ -340,7 +339,7 @@ function CVEditor() {
 
                 {/* Print-only view */}
                 <div className="hidden print:block">
-                    <ModernTemplate data={currentCV.data} />
+                    <ClassicTemplate data={currentCV.data} />
                 </div>
 
                 {/* Import Confirmation Modal */}

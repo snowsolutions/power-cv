@@ -13,7 +13,7 @@ const useCVStore = create(
             currentCV: {
                 id: null,
                 name: "Untitled CV",
-                template: TEMPLATES.MODERN,
+                template: TEMPLATES.CLASSIC,
                 data: getInitialCVData(),
                 createdAt: null,
                 updatedAt: null,
@@ -24,7 +24,7 @@ const useCVStore = create(
 
             // UI state
             isPreviewVisible: true,
-            selectedTemplate: TEMPLATES.MODERN,
+            selectedTemplate: TEMPLATES.CLASSIC,
             isDirty: false,
             isLoading: false,
             error: null,
@@ -201,12 +201,12 @@ const useCVStore = create(
                     currentCV: {
                         id: null,
                         name: "Untitled CV",
-                        template: TEMPLATES.MODERN,
+                        template: TEMPLATES.CLASSIC,
                         data: getInitialCVData(),
                         createdAt: new Date().toISOString(),
                         updatedAt: new Date().toISOString(),
                     },
-                    selectedTemplate: TEMPLATES.MODERN,
+                    selectedTemplate: TEMPLATES.CLASSIC,
                     isDirty: false,
                 }),
 
@@ -219,7 +219,7 @@ const useCVStore = create(
                         createdAt: new Date().toISOString(),
                         updatedAt: new Date().toISOString(),
                     },
-                    selectedTemplate: data.template || TEMPLATES.MODERN,
+                    selectedTemplate: data.template || TEMPLATES.CLASSIC,
                     isDirty: true,
                 }),
 
@@ -246,12 +246,12 @@ const useCVStore = create(
                     currentCV: {
                         id: null,
                         name: "Untitled CV",
-                        template: TEMPLATES.MODERN,
+                        template: TEMPLATES.CLASSIC,
                         data: getInitialCVData(),
                         createdAt: new Date().toISOString(),
                         updatedAt: new Date().toISOString(),
                     },
-                    selectedTemplate: TEMPLATES.MODERN,
+                    selectedTemplate: TEMPLATES.CLASSIC,
                     isDirty: false,
                 }),
 
@@ -508,25 +508,54 @@ const useCVStore = create(
                 try {
                     const result = await importCVFromFile(file);
 
+                    console.log(
+                        "[Import] Result from importCVFromFile:",
+                        result,
+                    );
+
                     if (result.success) {
+                        // Deep clone to ensure all references change
+                        const importedData = JSON.parse(
+                            JSON.stringify(result.cv.data),
+                        );
+
+                        console.log(
+                            "[Import] Introduction content:",
+                            importedData.introduction?.content?.substring(
+                                0,
+                                100,
+                            ),
+                        );
+                        console.log(
+                            "[Import] Full introduction object:",
+                            importedData.introduction,
+                        );
+
                         // Load imported CV data
                         set({
                             currentCV: {
-                                ...result.cv,
+                                id: null,
+                                name: result.cv.name,
+                                template: TEMPLATES.CLASSIC,
+                                data: importedData,
                                 createdAt: new Date().toISOString(),
                                 updatedAt: new Date().toISOString(),
                             },
-                            selectedTemplate:
-                                result.cv.template || TEMPLATES.MODERN,
+                            selectedTemplate: TEMPLATES.CLASSIC,
                             isDirty: true,
                             isLoading: false,
                         });
+
+                        console.log(
+                            "[Import] State updated with new currentCV",
+                        );
 
                         return {
                             success: true,
                             message: "CV imported successfully!",
                         };
                     } else {
+                        console.error("[Import] Import failed:", result.error);
                         set({ isLoading: false });
                         return {
                             success: false,

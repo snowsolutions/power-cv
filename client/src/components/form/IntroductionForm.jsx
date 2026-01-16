@@ -9,21 +9,39 @@ import useDebounce from "../../hooks/useDebounce";
 const IntroductionForm = ({ introduction, onUpdate, onUpdateSectionTitle }) => {
     // Local state for immediate UI updates
     const [localContent, setLocalContent] = useState(introduction.content);
+    const [lastPropContent, setLastPropContent] = useState(
+        introduction.content,
+    );
 
     // Debounced value that will update the store
     const debouncedContent = useDebounce(localContent, 300);
 
-    // Update local state when prop changes (for external updates)
+    // Update local state when prop changes (for external updates like import)
     useEffect(() => {
-        setLocalContent(introduction.content);
-    }, [introduction.content]);
-
-    // Update store when debounced value changes
-    useEffect(() => {
-        if (debouncedContent !== introduction.content) {
-            onUpdate(debouncedContent);
+        // Only update if the prop actually changed from an external source
+        if (
+            introduction.content !== lastPropContent &&
+            introduction.content !== localContent
+        ) {
+            console.log(
+                "[IntroductionForm] External update detected, syncing local state",
+            );
+            setLocalContent(introduction.content);
+            setLastPropContent(introduction.content);
         }
-    }, [debouncedContent, introduction.content, onUpdate]);
+    }, [introduction.content, lastPropContent, localContent]);
+
+    // Update store when debounced value changes (from user edits)
+    useEffect(() => {
+        if (
+            debouncedContent !== introduction.content &&
+            debouncedContent !== lastPropContent
+        ) {
+            console.log("[IntroductionForm] Updating store with user changes");
+            onUpdate(debouncedContent);
+            setLastPropContent(debouncedContent);
+        }
+    }, [debouncedContent, introduction.content, onUpdate, lastPropContent]);
 
     const handleContentChange = (content) => {
         setLocalContent(content);

@@ -19,7 +19,7 @@ export const exportCVAsJSON = (cvData, fileName = null) => {
             cv: {
                 id: cvData.id || null,
                 name: cvData.name || "Untitled CV",
-                template: cvData.template || "modern",
+                template: cvData.template || "classic",
                 data: cvData.data,
                 createdAt: cvData.createdAt || null,
                 updatedAt: cvData.updatedAt || null,
@@ -77,7 +77,7 @@ export const getCVAsJSONString = (cvData) => {
             cv: {
                 id: cvData.id || null,
                 name: cvData.name || "Untitled CV",
-                template: cvData.template || "modern",
+                template: cvData.template || "classic",
                 data: cvData.data,
                 createdAt: cvData.createdAt || null,
                 updatedAt: cvData.updatedAt || null,
