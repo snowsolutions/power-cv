@@ -14,7 +14,7 @@ import { exportToPDF } from "../../utils/pdfExport";
  */
 const CVPreview = memo(
     ({ data, template = "classic", isVisible = true, onToggleVisibility }) => {
-        const [zoom, setZoom] = useState(100);
+        const [zoom, setZoom] = useState(80);
         const [isExporting, setIsExporting] = useState(false);
         const [pageCount, setPageCount] = useState(1);
         const [currentPage, setCurrentPage] = useState(1);
@@ -258,25 +258,9 @@ const CVPreview = memo(
                     </div>
                 </div>
 
-                {/* Template Preview Area with A4 Page Visualization */}
-                <div className="bg-gray-100 rounded-lg p-6">
-                    {/* Template Container with Zoom */}
-                    <div
-                        ref={previewRef}
-                        className="mx-auto"
-                        style={{
-                            transform: `scale(${zoom / 100})`,
-                            transformOrigin: "top center",
-                            transition: "transform 0.2s ease-in-out",
-                        }}
-                    >
-                        <div data-template>{getTemplate()}</div>
-                    </div>
-                </div>
-
-                {/* Pagination Counter - Outside preview area */}
+                {/* Pagination Counter - Top of preview area */}
                 {pageCount > 1 && (
-                    <div className="flex justify-center mt-4">
+                    <div className="flex justify-center mb-4">
                         <div className="bg-gray-900 text-white px-4 py-2 rounded-full shadow-lg flex items-center gap-3">
                             <button
                                 onClick={() =>
@@ -330,6 +314,22 @@ const CVPreview = memo(
                         </div>
                     </div>
                 )}
+
+                {/* Template Preview Area with A4 Page Visualization */}
+                <div className="bg-gray-100 rounded-lg p-6">
+                    {/* Template Container with Zoom */}
+                    <div
+                        ref={previewRef}
+                        className="mx-auto"
+                        style={{
+                            transform: `scale(${zoom / 100})`,
+                            transformOrigin: "top center",
+                            transition: "transform 0.2s ease-in-out",
+                        }}
+                    >
+                        <div data-template>{getTemplate()}</div>
+                    </div>
+                </div>
 
                 {/* Preview Info */}
                 <div className="mt-4 flex items-center justify-between text-sm text-gray-500 flex-wrap gap-2">
